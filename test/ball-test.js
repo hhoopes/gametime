@@ -2,6 +2,7 @@ const assert = require('chai').assert;
 const sinon = require('sinon');
 
 const Ball = require('../lib/ball');
+const Block = require('../lib/block');
 
 describe('Ball', function() {
   let canvas = document.createElement('canvas')
@@ -87,17 +88,33 @@ describe('Ball', function() {
     xit('should call blockCollision function', function () {
       let spy = sinon.spy("blockCollision")
       let ball = new Ball(xy, xy, radius, speed, speed);
-      ball.checkBlocks(ball, []);
-      assert(spy.calledOnce, 'fillRect method was called on canvas context')
+      ball.checkBlocks(ball, [1]);
+      assert(spy.calledOnce, 'blockCollision method was called on ball')
     })
   })
 
-  describe('blockCollision', function () {
-    it('should reset ball status', function () {
-      let ball = new Ball(xy, xy, radius, speed, speed);
-      ball.collided = true;
-      ball.checkBlocks(ball, []);
-      assert.equal(ball.collided, false);
+  // describe('blockCollision', function () {
+  //   it('', function () {
+  //     let ball = new Ball(xy, xy, radius, speed, speed);
+  //     ball.collided = true;
+  //     ball.checkBlocks(ball, []);
+  //     assert.equal(ball.collided, false);
+  //   });
+  // })
+
+  describe('intersects', function () {
+    let size = 10;
+    let ball = new Ball(xy, xy, radius, speed, speed);
+    it('should detect collision if overlapping', function () {
+      let block = new Block(xy, xy, size, size, 'black');
+
+      assert.equal(ball.intersects(ball, block), true);
+    });
+
+    it('should not detect collision if not overlapping', function () {
+      let block = new Block(xy+radius+1, xy, size, size, 'black');
+
+      assert.equal(ball.intersects(ball, block), false);
     });
   })
 });
