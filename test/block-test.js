@@ -27,8 +27,8 @@ describe('Block', function() {
       assert.equal(block.color, 'black');
     });
 
-    it('should have a default status of 1', function(){
-      assert.equal(block.status, 1);
+    it('should have a default render status of true', function(){
+      assert.equal(block.render, true);
     });
   });
 });

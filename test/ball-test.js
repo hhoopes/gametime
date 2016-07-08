@@ -9,7 +9,9 @@ describe('Ball', function() {
   let ctx = canvas.getContext('2d');
   let xy = 50;
   let radius = 5;
+  let blockSize = 10;
   let speed = -6;
+
   context('should take attributes', function() {
     let ball = new Ball(xy, xy, radius, speed, speed);
 
@@ -78,7 +80,7 @@ describe('Ball', function() {
   })
 
   describe('checkBlocks', function () {
-    it('should reset ball status', function () {
+    it('should reset ball collided status', function () {
       let ball = new Ball(xy, xy, radius, speed, speed);
       ball.collided = true;
       ball.checkBlocks(ball, []);
@@ -93,28 +95,94 @@ describe('Ball', function() {
     })
   })
 
-  // describe('blockCollision', function () {
-  //   it('', function () {
-  //     let ball = new Ball(xy, xy, radius, speed, speed);
-  //     ball.collided = true;
-  //     ball.checkBlocks(ball, []);
-  //     assert.equal(ball.collided, false);
-  //   });
-  // })
+  describe('blockCollision', function () {
+    it('does nothing if ball has already collided', function () {
+      let ball = new Ball(xy, xy, radius, speed, speed);
+      let block = new Block(xy, xy, 10, 10, 'black');
+      ball.collided = true;
+      ball.blockCollision(block, 0, [], ball);
+      assert.equal(ball.xSpeed, speed);
+      assert.equal(ball.ySpeed, speed);
+    });
+
+    it('does nothing if block has been removed', function() {
+      let ball = new Ball(xy, xy, radius, speed, speed);
+      let block = new Block(xy, xy, 10, 10, 'black');
+      block.render = false;
+      ball.blockCollision(block, 0, [], ball);
+      assert.equal(ball.xSpeed, speed);
+      assert.equal(ball.ySpeed, speed);
+    });
+
+    it('does nothing if ball and block do not collide', function() {
+      let ball = new Ball(xy, xy, radius, speed, speed);
+      let block = new Block(xy + radius, xy, 10, 10, 'black');
+      block.x += radius;
+      ball.blockCollision(block, 0, [], ball);
+      assert.equal(ball.xSpeed, speed);
+      assert.equal(ball.ySpeed, speed);
+    });
+
+    it('sets ball collision to true and block render to false on collision', function() {
+      let ball = new Ball(xy, xy, radius, speed, speed);
+      let block = new Block(xy, xy, 10, 10, 'black');
+      ball.blockCollision(block, 0, [], ball);
+      assert.equal(ball.collided, true);
+      assert.equal(block.render, false);
+    });
+
+    xit('should call whichSide function', function () {
+      let spy = sinon.spy("whichSide")
+      let ball = new Ball(xy, xy, radius, speed, speed);
+      let block = new Block(xy, xy, 10, 10, 'black');
+      ball.blockCollision(block);
+      assert(spy.calledOnce, 'whichSide method was called on ball')
+    })
+  })
 
   describe('intersects', function () {
-    let size = 10;
     let ball = new Ball(xy, xy, radius, speed, speed);
     it('should detect collision if overlapping', function () {
-      let block = new Block(xy, xy, size, size, 'black');
+      let block = new Block(xy, xy, blockSize, blockSize, 'black');
 
       assert.equal(ball.intersects(ball, block), true);
     });
 
     it('should not detect collision if not overlapping', function () {
-      let block = new Block(xy+radius+1, xy, size, size, 'black');
+      let block = new Block(xy+radius+1, xy, blockSize, blockSize, 'black');
 
       assert.equal(ball.intersects(ball, block), false);
+    });
+  })
+
+  describe('whichSide', function () {
+    it('reverses ySpeed when colliding with top', function () {
+      let ball = new Ball(xy+radius, xy-radius+1, radius, speed, speed);
+      let block = new Block(xy, xy, blockSize, blockSize, 'black');
+      assert.equal(ball.ySpeed, speed);
+      ball.whichSide(ball, block);
+      assert.equal(ball.ySpeed, -speed);
+    });
+    it('reverses ySpeed when colliding with bottom', function () {
+      let ball = new Ball(xy+radius, xy+radius-1, radius, speed, speed);
+      let block = new Block(xy, xy, blockSize, blockSize, 'black');
+      assert.equal(ball.ySpeed, speed);
+      ball.whichSide(ball, block);
+      assert.equal(ball.ySpeed, -speed);
+    });
+    it('reverses xSpeed when colliding with left', function () {
+      let ball = new Ball(xy-radius+1, xy+radius, radius, speed, speed);
+      let block = new Block(xy, xy, blockSize, blockSize, 'black');
+      assert.equal(ball.xSpeed, speed);
+      ball.whichSide(ball, block);
+      assert.equal(ball.xSpeed, -speed);
+    });
+    it('reverses xSpeed when colliding with right', function () {
+      let ball = new Ball(xy+radius-1, xy+radius, radius, speed, speed);
+      let block = new Block(xy, xy, blockSize, blockSize, 'black');
+      assert.equal(ball.xSpeed, speed);
+      ball.whichSide(ball, block);
+      assert.equal(ball.xSpeed, -speed);
     });
   })
 });
