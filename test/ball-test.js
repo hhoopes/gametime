@@ -76,19 +76,28 @@ describe('Ball', function() {
     })
   })
 
+  describe('checkBlocks', function () {
+    it('should reset ball status', function () {
+      let ball = new Ball(xy, xy, radius, speed, speed);
+      ball.collided = true;
+      ball.checkBlocks(ball, []);
+      assert.equal(ball.collided, false);
+    });
+
+    xit('should call blockCollision function', function () {
+      let spy = sinon.spy("blockCollision")
+      let ball = new Ball(xy, xy, radius, speed, speed);
+      ball.checkBlocks(ball, []);
+      assert(spy.calledOnce, 'fillRect method was called on canvas context')
+    })
+  })
+
   describe('blockCollision', function () {
     it('should reset ball status', function () {
       let ball = new Ball(xy, xy, radius, speed, speed);
       ball.collided = true;
-      ball.blockCollision(ball, []);
+      ball.checkBlocks(ball, []);
       assert.equal(ball.collided, false);
     });
-
-    xit('should call intersect function', function () {
-      let spy = sinon.spy("intersect")
-      let ball = new Ball(xy, xy, radius, speed, speed);
-      ball.blockCollision(ball, []);
-      assert(spy.calledOnce, 'fillRect method was called on canvas context')
-    })
   })
 });
