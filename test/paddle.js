@@ -143,18 +143,18 @@ describe('paddle', function() {
 
         context('with y not too far down and vertical set to true', function() {
           it('adds 9 to y', function() {
-            paddle.y = 100
+            paddle.y = 100;
             paddle.leftPressed = true;
             paddle.vertical = true;
             let originalY = paddle.y;
             paddle.move();
             expect(paddle.y).to.eql(originalY + 9);
-          })
+          });
         });
 
         context('with y not too far down and vertical set to false', function() {
           it('subtracts 9 from x', function() {
-            paddle.y = 100
+            paddle.y = 100;
             paddle.leftPressed = true;
             let originalX = paddle.x;
             paddle.move();

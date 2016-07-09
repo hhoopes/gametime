@@ -1,1 +1,1 @@
-require('./paddle.js')
+require('./paddle.js');
