@@ -16,9 +16,16 @@ describe('Game', function() {
       assert.equal(game.canvas, canvas);
     });
 
-    it('should create empty block and ball arrays', function() {
-      assert.equal(game.blocks.length, 0);
+    it('should create empty ball array', function() {
       assert.equal(game.balls.length, 0);
+    });
+
+    it('should create quadrants array with four empty sub-arrays', function() {
+      assert.equal(game.quadrants.length, 4);
+      assert.equal(game.quadrants[0].length, 0);
+      assert.equal(game.quadrants[1].length, 0);
+      assert.equal(game.quadrants[2].length, 0);
+      assert.equal(game.quadrants[3].length, 0);
     });
   });
 

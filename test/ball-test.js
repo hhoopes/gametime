@@ -44,14 +44,14 @@ describe('Ball', function() {
     it('should change x by speed', function () {
       let ball = new Ball(xy, xy, radius, speed, speed);
       assert.equal(ball.x, xy);
-      ball.move([], ctx);
+      ball.move([[],[],[],[]], ctx);
       assert.equal(ball.x, xy+speed);
     });
 
     it('should change y by speed', function () {
       let ball = new Ball(xy, xy, radius, speed, speed);
       assert.equal(ball.y, xy);
-      ball.move([], ctx);
+      ball.move([[],[],[],[]], ctx);
       assert.equal(ball.y, xy+speed);
     })
   })
@@ -79,18 +79,23 @@ describe('Ball', function() {
     })
   })
 
-  describe('checkBlocks', function () {
+  describe('checkQuadrant', function () {
     it('should reset ball collided status', function () {
       let ball = new Ball(xy, xy, radius, speed, speed);
       ball.collided = true;
-      ball.checkBlocks(ball, []);
+      ball.checkQuadrant(ball, [[],[],[],[]], ctx);
       assert.equal(ball.collided, false);
+    });
+
+    xit('should only check the appropriate quadrant', function () {
+      let ball = new Ball(100, 40, radius, speed, speed);
+      ball.checkQuadrant(ball, [[],[],[],[]], ctx);
     });
 
     xit('should call blockCollision function', function () {
       let spy = sinon.spy("blockCollision")
       let ball = new Ball(xy, xy, radius, speed, speed);
-      ball.checkBlocks(ball, [1]);
+      ball.checkQuadrant(ball, [1], ctx);
       assert(spy.calledOnce, 'blockCollision method was called on ball')
     })
   })
