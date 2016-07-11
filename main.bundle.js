@@ -63,10 +63,10 @@
 	paddle4.setupPaddleEventListeners();
 
 	var myPaddle = determinePaddle();
-	console.log(myPaddle);
+	console.log(myPaddle.socketInfo());
 
 	function gametime() {
-	  player.currentPaddlePositions(myPaddle.socketInfo());
+	  // player.currentPaddlePositions(myPaddle.socketInfo());
 	  ctx.clearRect(0, 0, canvas.width, canvas.height);
 	  paddle1.draw();
 	  paddle2.draw();
@@ -317,6 +317,7 @@
 	    _classCallCheck(this, PlayerSocket);
 
 	    this.socket = __webpack_require__(3)('http://127.0.0.1:3000');
+	    console.log(this.socket);
 	  }
 
 	  // sendPaddle (paddle) {
@@ -334,12 +335,10 @@
 	  }, {
 	    key: 'myPaddle',
 	    value: function myPaddle() {
-	      while (this.playerNumber === undefined) {
-	        this.socket.emit('playerNumber');
-	        this.socket.on('playerNumber', function (playerNumber) {
-	          this.playerNumber = playerNumber;
-	        });
-	      }
+	      this.socket.emit('playerNumber');
+	      this.socket.on('playerNumber', function (playerNumber) {
+	        this.playerNumber = playerNumber;
+	      });
 	      return this.playerNumber;
 	    }
 	  }]);
