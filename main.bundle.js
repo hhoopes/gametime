@@ -52,43 +52,55 @@
 	var player = new PlayerSocket();
 	var canvas = document.getElementById('myCanvas');
 	var ctx = canvas.getContext('2d');
+	var myPaddle;
 
 	var paddle1 = new Paddle(1, canvas, ctx);
 	var paddle2 = new Paddle(2, canvas, ctx);
 	var paddle3 = new Paddle(3, canvas, ctx);
 	var paddle4 = new Paddle(4, canvas, ctx);
-	paddle1.setupPaddleEventListeners();
-	paddle2.setupPaddleEventListeners();
-	paddle3.setupPaddleEventListeners();
-	paddle4.setupPaddleEventListeners();
+	var paddles = [paddle1, paddle2, paddle3, paddle4];
 
-	var myPaddle = determinePaddle();
-	console.log(myPaddle.socketInfo());
+	paddles.forEach(function (paddle) {
+	  paddle.setupPaddleEventListeners();
+	});
 
 	function gametime() {
-	  // player.currentPaddlePositions(myPaddle.socketInfo());
+	  player.currentPaddlePositions(myPaddle);
 	  ctx.clearRect(0, 0, canvas.width, canvas.height);
-	  paddle1.draw();
-	  paddle2.draw();
-	  paddle3.draw();
-	  paddle4.draw();
+	  paddles.forEach(function (paddle) {
+	    paddle.update(player.paddleInfo[paddle.player]);
+	    if (paddle === myPaddle) {
+	      paddle.draw(myPaddle);
+	    } else {
+	      // console.log(paddle);
+	      // console.log(positions[paddle.player]);
+	      paddle.update(player.paddleInfo[paddle.player]);
+	      paddle.draw();
+	    }
+	    // positions[paddle.player]
+	  });
 	  requestAnimationFrame(gametime);
 	}
 
+	player.startFromSockets(function () {
+	  // console.log('hello');
+	  myPaddle = determinePaddle();
+	  gametime();
+	});
+
 	function determinePaddle() {
-	  var number = player.myPaddle();
-	  if (number === 'one') {
+	  var number = player.playerNumber;
+	  // console.log(number);
+	  if (number === 1) {
 	    return paddle1;
-	  } else if (number === 'two') {
+	  } else if (number === 2) {
 	    return paddle2;
-	  } else if (number === 'three') {
+	  } else if (number === 3) {
 	    return paddle3;
-	  } else if (number === 'four') {
+	  } else if (number === 4) {
 	    return paddle4;
 	  }
 	}
-
-	gametime();
 
 /***/ },
 /* 1 */
@@ -121,13 +133,17 @@
 	  }
 
 	  _createClass(Paddle, [{
-	    key: 'socketInfo',
-	    value: function socketInfo() {
-	      return { playerNumber: this.player, vertical: this.vertical, x: this.x, y: this.y };
+	    key: 'update',
+	    value: function update(position) {
+	      // console.log(this);
+	      // console.log(position);
+	      // this.x = position.x;
+	      // this.y = position.y;
+	      // this.vertical = position.vertical;
 	    }
 	  }, {
 	    key: 'draw',
-	    value: function draw() {
+	    value: function draw(myPaddle) {
 	      this.ctx.beginPath();
 	      if (this.vertical) {
 	        this.ctx.rect(this.x, this.y, this.paddleHeight, this.paddleWidth);
@@ -137,7 +153,9 @@
 	      this.ctx.fillStyle = '#0095DD';
 	      this.ctx.fill();
 	      this.ctx.closePath();
-	      this.move();
+	      if (this === myPaddle) {
+	        this.move();
+	      }
 	    }
 	  }, {
 	    key: 'move',
@@ -317,7 +335,8 @@
 	    _classCallCheck(this, PlayerSocket);
 
 	    this.socket = __webpack_require__(3)('http://127.0.0.1:3000');
-	    console.log(this.socket);
+	    this.playerNumber = 'test';
+	    this.paddleInfo = {};
 	  }
 
 	  // sendPaddle (paddle) {
@@ -326,20 +345,23 @@
 
 	  _createClass(PlayerSocket, [{
 	    key: 'currentPaddlePositions',
-	    value: function currentPaddlePositions(paddleInfo) {
-	      this.socket.emit('paddle', paddleInfo);
-	      // this.socket.on('paddle', function(players, paddleInfo) {
-	      //   console.log(players, paddleInfo);
-	      // });
+	    value: function currentPaddlePositions(myPaddle) {
+	      var self = this;
+	      this.socket.emit('paddle', myPaddle);
+	      this.socket.on('paddle', function (paddleInfo) {
+	        self.paddleInfo = paddleInfo;
+	        // console.log(paddleInfo);
+	      });
 	    }
 	  }, {
-	    key: 'myPaddle',
-	    value: function myPaddle() {
-	      this.socket.emit('playerNumber');
-	      this.socket.on('playerNumber', function (playerNumber) {
-	        this.playerNumber = playerNumber;
+	    key: 'startFromSockets',
+	    value: function startFromSockets(callback) {
+	      this.socket.emit('initialize');
+	      var self = this;
+	      this.socket.on('initialize', function (playerNumber) {
+	        self.playerNumber = playerNumber;
+	        callback();
 	      });
-	      return this.playerNumber;
 	    }
 	  }]);
 

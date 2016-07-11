@@ -90,13 +90,17 @@
 	  }
 
 	  _createClass(Paddle, [{
-	    key: 'socketInfo',
-	    value: function socketInfo() {
-	      return { playerNumber: this.player, vertical: this.vertical, x: this.x, y: this.y };
+	    key: 'update',
+	    value: function update(position) {
+	      // console.log(this);
+	      // console.log(position);
+	      // this.x = position.x;
+	      // this.y = position.y;
+	      // this.vertical = position.vertical;
 	    }
 	  }, {
 	    key: 'draw',
-	    value: function draw() {
+	    value: function draw(myPaddle) {
 	      this.ctx.beginPath();
 	      if (this.vertical) {
 	        this.ctx.rect(this.x, this.y, this.paddleHeight, this.paddleWidth);
@@ -106,7 +110,9 @@
 	      this.ctx.fillStyle = '#0095DD';
 	      this.ctx.fill();
 	      this.ctx.closePath();
-	      this.move();
+	      if (this === myPaddle) {
+	        this.move();
+	      }
 	    }
 	  }, {
 	    key: 'move',
