@@ -2,6 +2,7 @@ const assert = require('chai').assert;
 
 const Ball = require('../lib/ball');
 const Block = require('../lib/block');
+const Paddle = require('../lib/paddle');
 
 describe('Ball', function() {
   let canvas = document.createElement('canvas')
@@ -43,14 +44,14 @@ describe('Ball', function() {
     it('should change x by speed', function () {
       let ball = new Ball(xy, xy, radius, speed, speed);
       assert.equal(ball.x, xy);
-      ball.move([[],[],[],[]], ctx);
+      ball.move([[],[],[],[]], [], ctx);
       assert.equal(ball.x, xy+speed);
     });
 
     it('should change y by speed', function () {
       let ball = new Ball(xy, xy, radius, speed, speed);
       assert.equal(ball.y, xy);
-      ball.move([[],[],[],[]], ctx);
+      ball.move([[],[],[],[]], [], ctx);
       assert.equal(ball.y, xy+speed);
     })
   })
