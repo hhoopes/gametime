@@ -1,7 +1,7 @@
 const chai = require('chai');
 const expect = chai.expect;
 const Paddle = require('../lib/paddle');
-const canvas = { width: 1000, height: 1000 };
+const canvas = 1000;
 let paddle = new Paddle(1, canvas);
 
 describe('paddle', function() {
@@ -15,7 +15,7 @@ describe('paddle', function() {
       it('assigns the canvas that is passed in', function() {
         expect(paddle.canvas).to.eql(canvas);
       });
-      
+
       it('assigns a paddleWidth of 60', function() {
         expect(paddle.paddleWidth).to.eql(60);
       });
@@ -41,15 +41,15 @@ describe('paddle', function() {
       });
 
       it('assigns y as one third of the canvas height', function() {
-        expect(paddle.y).to.eql(canvas.height / 3);
+        expect(paddle.y).to.eql(canvas / 3);
       });
 
       it('assigns oneThirdWidth as one third of the canvas width', function() {
-        expect(paddle.oneThirdWidth).to.eql(canvas.width / 3);
+        expect(paddle.oneThirdWidth).to.eql(canvas / 3);
       });
 
       it('assigns oneThirdHeight as one third of the canvas height', function() {
-        expect(paddle.oneThirdHeight).to.eql(canvas.height / 3);
+        expect(paddle.oneThirdHeight).to.eql(canvas / 3);
       });
 
       it('assigns rightKeyCode to be 39', function() {
@@ -103,7 +103,7 @@ describe('paddle', function() {
             expect(paddle.y).to.eql(originalY - 9);
           });
         });
-        
+
         context('with x not too far to the right and vertical equals false', function() {
           it('adds 9 to the x', function() {
             paddle.rightPressed = true;
@@ -187,7 +187,7 @@ describe('paddle', function() {
     context('as player 2 or 4', function() {
       it('returns canvas width minus the paddle width minus 10', function() {
         paddle = new Paddle(2, canvas);
-        expect(paddle.setPaddleX()).to.eql(paddle.canvas.width - paddle.paddleWidth - 10);
+        expect(paddle.setPaddleX()).to.eql(paddle.canvas - paddle.paddleWidth - 10);
       });
     });
   });
