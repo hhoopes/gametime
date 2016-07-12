@@ -168,6 +168,7 @@ describe('Ball', function() {
       ball.whichSide(ball, block);
       assert.equal(ball.ySpeed, -speed);
     });
+
     it('reverses ySpeed when colliding with bottom', function () {
       let ball = new Ball(xy+radius, xy+radius-1, radius, speed, speed);
       let block = new Block(xy, xy, blockSize, blockSize, 'black');
@@ -175,6 +176,7 @@ describe('Ball', function() {
       ball.whichSide(ball, block);
       assert.equal(ball.ySpeed, -speed);
     });
+
     it('reverses xSpeed when colliding with left', function () {
       let ball = new Ball(xy-radius+1, xy+radius, radius, speed, speed);
       let block = new Block(xy, xy, blockSize, blockSize, 'black');
@@ -182,6 +184,7 @@ describe('Ball', function() {
       ball.whichSide(ball, block);
       assert.equal(ball.xSpeed, -speed);
     });
+
     it('reverses xSpeed when colliding with right', function () {
       let ball = new Ball(xy+radius-1, xy+radius, radius, speed, speed);
       let block = new Block(xy, xy, blockSize, blockSize, 'black');
@@ -189,5 +192,41 @@ describe('Ball', function() {
       ball.whichSide(ball, block);
       assert.equal(ball.xSpeed, -speed);
     });
-  })
+  });
+
+  describe('#top', function() {
+
+    it('returns the center y coordinate minus the radius', function() {
+      let ball = new Ball(50, 50, 10, 0, 0)
+      let top = 40;
+      assert.equal(ball.top(), top);
+    });
+  });
+
+  describe('#bottom', function() {
+
+    it('returns the center y coordinate plus the radius', function() {
+      let ball = new Ball(50, 50, 10, 0, 0)
+      let bottom = 60;
+      assert.equal(ball.bottom(), bottom);
+    });
+  });
+
+  describe('#left', function() {
+
+    it('returns the center x coordinate minus the radius', function() {
+      let ball = new Ball(50, 50, 10, 0, 0)
+      let left = 40;
+      assert.equal(ball.left(), left);
+    });
+  });
+
+  describe('#right', function() {
+
+    it('returns the center x coordinate plus the radius', function() {
+      let ball = new Ball(50, 50, 10, 0, 0)
+      let right = 60;
+      assert.equal(ball.right(), right);
+    });
+  });
 });
