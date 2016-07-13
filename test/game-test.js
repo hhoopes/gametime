@@ -5,7 +5,7 @@ const Game = require('../lib/game');
 describe('Game', function() {
   let canvas = document.createElement('canvas')
   let ctx = canvas.getContext('2d');
-  context('should take attributes', function() {
+  context('should take and create attributes', function() {
     let game = new Game(ctx, canvas);
 
     it('should recieve and assign the ctx', function() {
@@ -20,12 +20,18 @@ describe('Game', function() {
       assert.equal(game.balls.length, 0);
     });
 
-    it('should create quadrants array with four empty sub-arrays', function() {
-      assert.equal(game.quadrants.length, 4);
-      assert.equal(game.quadrants[0].length, 0);
-      assert.equal(game.quadrants[1].length, 0);
-      assert.equal(game.quadrants[2].length, 0);
-      assert.equal(game.quadrants[3].length, 0);
+    it('should create empty paddle array', function() {
+      assert.equal(game.paddles.length, 0);
+    });
+
+    it('should create empty player array', function() {
+      assert.equal(game.players.length, 0);
+    });
+
+    it('should establish block and player sizes', function() {
+      assert.equal(game.cornerSize, 5);
+      assert.equal(game.playerSize, 2);
+      assert.equal(game.blockSize, 43);
     });
   });
 

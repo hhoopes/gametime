@@ -1,0 +1,25 @@
+body{
+  background-color: #2C363F;
+  font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+.instructions{
+  display: inline-block;
+  vertical-align: top;
+  color: white;
+  width: 25%;
+  padding: 15px;
+  margin-left: 35px;
+}
+
+.instructions li {
+  line-height: 200%;
+}
+
+.canvas{
+  display: inline-block;
+}
+
+#game-canvas{
+  background-color: black;
+}
