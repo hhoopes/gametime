@@ -2,7 +2,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var players = {};
-var playerNumbers = [];
+var playerNumbers = [4, 3, 2, 1];
 var paddles = {
           '1': {player: 1, x: 10, y: (660 / 3), vertical: false},
           '2': {player: 2, x: 590, y: (660 / 3), vertical: false},
@@ -23,24 +23,24 @@ const PORT = process.env.PORT || 3000;
 
 io.on('connection', function(socket){
   console.log('SOMEONE IS TRYING TO CONNECT!!!!!!', socket.client.id);
- if (playerNumbers !== []){
+  if (playerNumbers !== []) {
     playerInfo(socket);
   }
   socket.on('initialize', function() {
     socket.emit('initialize', players[socket.client.id]);
   });
   socket.on('paddle', function(paddle){
-    if (playerNumbers === []) {
-      io.emit('ready', paddles);
-    }
     paddles[paddle.player] = paddleLocation(paddle);
     // console.log(players);
     io.emit('paddles', (paddles));
   });
+  console.log(playerNumbers)
+  if (playerNumbers.length === 0) {
+    io.sockets.emit('ready', paddles);
+  }
   socket.on('disconnect', function() {
-    delete players[socket.client.id];
     playerNumbers.push(players[socket.client.id]);
-    // playerCount--;
+    delete players[socket.client.id];
   });
 });
 
@@ -59,8 +59,5 @@ function paddleLocation(paddleInfo) {
 
 function playerInfo(socket){
   players[socket.client.id] = playerNumbers.pop();
-  console.log(players[socket.client.id]);
-  console.log(playerNumbers);
-
   return players[socket.client.id];
 }
