@@ -8,7 +8,8 @@ body{
   vertical-align: top;
   color: white;
   width: 25%;
-  padding: 50px;
+  padding: 15px;
+  margin-left: 35px;
 }
 
 .instructions li {
