@@ -22,6 +22,7 @@ app.get('/warlords.js', function(req, res) {
 const PORT = process.env.PORT || 3000;
 
 io.on('connection', function(socket){
+  var readySignalSent = false;
   console.log('SOMEONE IS TRYING TO CONNECT!!!!!!', socket.client.id);
   if (playerNumbers !== []) {
     playerInfo(socket);
@@ -30,14 +31,16 @@ io.on('connection', function(socket){
     socket.emit('initialize', players[socket.client.id]);
   });
   socket.on('paddle', function(paddle){
+    if (playerNumbers.length === 0 && readySignalSent === false) {
+      readySignalSent = true;
+      io.sockets.emit('ready', paddles);
+    }
     paddles[paddle.player] = paddleLocation(paddle);
     // console.log(players);
     io.emit('paddles', (paddles));
   });
   console.log(playerNumbers)
-  if (playerNumbers.length === 0) {
-    io.sockets.emit('ready', paddles);
-  }
+
   socket.on('disconnect', function() {
     playerNumbers.push(players[socket.client.id]);
     delete players[socket.client.id];
