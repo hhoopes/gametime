@@ -69,738 +69,35 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var Ball = __webpack_require__(2);
-	var Block = __webpack_require__(3);
-	var Paddle = __webpack_require__(4);
-	var Player = __webpack_require__(5);
-	var Socket = __webpack_require__(6);
-
-	var game = (function () {
-	  function Game(ctx, canvas) {
-	    _classCallCheck(this, Game);
-
-	    this.ctx = ctx;
-	    this.canvas = canvas;
-	    this.balls = [];
-	    this.paddles = [];
-	    this.players = [];
-	    this.cornerSize = 5;
-	    this.playerSize = 2;
-	    this.blockSize = 42;
-	  }
-
-	  _createClass(Game, [{
-	    key: 'beginLocalRound',
-	    value: function beginLocalRound() {
-	      var game = this;
-	      game.ctx.shadowColor = 'white';
-	      game.ctx.shadowBlur = 15;
-	      game.createGrid();
-	      game.balls.push(new Ball(275, 390, 10, 6, -3));
-	      setInterval(function () {
-	        game.balls.push(new Ball(375, 530, 10, -3, -4));
-	      }, 20000);
-
-	      requestAnimationFrame(function gameTime() {
-	        game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
-	        game.players.forEach(function (player) {
-	          player.draw(game.ctx);
-	        });
-	        game.balls.forEach(function (ball) {
-	          ball.draw(game.ctx).move(game.paddles, game.players, game.canvas);
-	        });
-
-	        if (game.players.filter(function (player) {
-	          return player.status === 1;
-	        }).length === 1) {
-	          game.players.forEach(function (player) {
-	            player.draw(game.ctx);
-	          });
-	          cancelAnimationFrame();
-	        } else {
-	          requestAnimationFrame(gameTime);
-	        }
-	      });
-	    }
-	  }, {
-	    key: 'beginOnlineRound',
-	    value: function beginOnlineRound() {
-	      var game = this;
-	      game.socket = new Socket();
-	      game.ctx.shadowColor = 'white';
-	      game.ctx.shadowBlur = 15;
-	      game.createGrid();
-	      game.balls.push(new Ball(275, 390, 10, 6, -3));
-	      setInterval(function () {
-	        game.balls.push(new Ball(375, 530, 10, -3, -4));
-	      }, 20000);
-
-	      requestAnimationFrame(function gameTime() {
-	        game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
-	        game.players.forEach(function (player) {
-	          player.draw(game.ctx, game.socket.paddleInfo[player.num]);
-	        });
-	        game.balls.forEach(function (ball) {
-	          ball.draw(game.ctx).move(game.paddles, game.players, game.canvas);
-	        });
-
-	        if (game.players.filter(function (player) {
-	          return player.status === 1;
-	        }).length === 1) {
-	          game.players.forEach(function (player) {
-	            player.draw(game.ctx);
-	          });
-	          cancelAnimationFrame();
-	        } else {
-	          requestAnimationFrame(gameTime);
-	        }
-	      });
-	    }
-	  }, {
-	    key: 'createGrid',
-	    value: function createGrid() {
-	      var canvasSize = this.canvas.width;
-	      var blockSize = this.blockSize;
-	      var playerSpace = blockSize * this.playerSize;
-	      var numBlocks = this.cornerSize;
-	      var deadSpace = canvasSize - blockSize * numBlocks;
-
-	      this.players.push(new Player(1, 0, 0, playerSpace, canvasSize, '#00DD6B'));
-	      this.players.push(new Player(2, canvasSize - playerSpace, 0, playerSpace, canvasSize, '#DCED31'));
-	      this.players.push(new Player(3, 0, canvasSize - playerSpace, playerSpace, canvasSize, '#FF3864'));
-	      this.players.push(new Player(4, canvasSize - playerSpace, canvasSize - playerSpace, playerSpace, canvasSize, '#00A5FF'));
-
-	      this.players.forEach(function (player) {
-	        player.paddleListeners();
-	      });
-
-	      for (var y = 0; y < numBlocks; y++) {
-	        for (var x = 0; x < numBlocks; x++) {
-	          // Top Left
-	          if (x * blockSize >= playerSpace || y * blockSize >= playerSpace) {
-	            this.players[0].blocks.push(new Block(x * blockSize, y * blockSize, blockSize, this.players[0].color));
-	          }
-	          // Top Right
-	          if ((x + 1) * blockSize + deadSpace <= canvasSize - playerSpace || y * blockSize >= playerSpace) {
-	            this.players[1].blocks.push(new Block(deadSpace + x * blockSize, y * blockSize, blockSize, this.players[1].color));
-	          }
-	          // Bottom Left
-	          if (x * blockSize >= playerSpace || (y + 1) * blockSize + deadSpace <= canvasSize - playerSpace) {
-	            this.players[2].blocks.push(new Block(x * blockSize, deadSpace + y * blockSize, blockSize, this.players[2].color));
-	          }
-	          // Bottom Right
-	          if ((x + 1) * blockSize + deadSpace <= canvasSize - playerSpace || (y + 1) * blockSize + deadSpace <= canvasSize - playerSpace) {
-	            this.players[3].blocks.push(new Block(deadSpace + x * blockSize, deadSpace + y * blockSize, blockSize, this.players[3].color));
-	          }
-	        }
-	      }
-	    }
-	  }]);
-
-	  return Game;
-	})();
-
-	function random() {
-	  return Math.random() < 0.5 ? -1 : 1;
-	  return Math.random() * (6 - min) + min;
-	}
-
-	module.exports = game;
-
-/***/ },
-/* 2 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	var ball = (function () {
-	  function Ball(xStart, yStart, radius, xSpeed, ySpeed) {
-	    _classCallCheck(this, Ball);
-
-	    this.x = xStart;
-	    this.y = yStart;
-	    this.radius = radius;
-	    this.xSpeed = xSpeed;
-	    this.ySpeed = ySpeed;
-	    this.collided = false;
-	  }
-
-	  _createClass(Ball, [{
-	    key: 'draw',
-	    value: function draw(ctx) {
-	      ctx.beginPath();
-	      ctx.fillStyle = 'white';
-	      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-	      ctx.fill();
-	      return this;
-	    }
-	  }, {
-	    key: 'move',
-	    value: function move(paddles, players, canvas) {
-	      this.wallCollision(canvas);
-	      this.checkQuadrant(players, canvas);
-	      this.checkPlayers(players);
-	      this.x += this.xSpeed;
-	      this.y += this.ySpeed;
-	      return this;
-	    }
-	  }, {
-	    key: 'wallCollision',
-	    value: function wallCollision(canvas) {
-	      //left or right
-	      if (this.x + this.xSpeed > canvas.width - this.radius || this.x + this.xSpeed < 0 + this.radius) {
-	        this.xSpeed *= -1;
-	      }
-	      //top or bottom
-	      if (this.y + this.ySpeed > canvas.height - this.radius || this.y + this.ySpeed < 0 + this.radius) {
-
-	        this.ySpeed *= -1;
-	      }
-	    }
-	  }, {
-	    key: 'checkQuadrant',
-	    value: function checkQuadrant(players, canvas) {
-	      var ball = this;
-	      ball.collided = false;
-	      if (ball.y < canvas.height / 2) {
-	        if (ball.x < canvas.width / 2) {
-	          players[0].blocks.forEach(function (block) {
-	            ball.blockCollision(block);
-	          });
-	        } else {
-	          players[1].blocks.forEach(function (block) {
-	            ball.blockCollision(block);
-	          });
-	        }
-	      } else {
-	        if (ball.x < canvas.width / 2) {
-	          players[2].blocks.forEach(function (block) {
-	            ball.blockCollision(block);
-	          });
-	        } else {
-	          players[3].blocks.forEach(function (block) {
-	            ball.blockCollision(block);
-	          });
-	        }
-	      }
-	    }
-	  }, {
-	    key: 'blockCollision',
-	    value: function blockCollision(block) {
-	      if (this.collided === false && block.render === true && this.intersects(block)) {
-	        this.collided = true;
-	        block.render = false;
-
-	        this.whichSide(block);
-	      }
-	    }
-	  }, {
-	    key: 'intersects',
-	    value: function intersects(block) {
-	      var ball = this;
-	      // Find the closest point to the circle within the rectangle
-	      // Consider refactoring to use this calculation to determine closest edge / corner
-	      // ie: if(closestX < closestY){ball.xSpeed = -ball.xSpeed} else {ball.ySpeed = -ball.ySpeed;}
-	      var closestX = clamp(ball.x, block.x, block.x + block.width);
-	      var closestY = clamp(ball.y, block.y, block.y + block.height);
-	      // Calculate the distance between the circle's center and ball closest point
-	      var distanceX = ball.x - closestX;
-	      var distanceY = ball.y - closestY;
-
-	      // If the distance is less than the circle's radius, an intersection occurs
-	      var distanceSquared = distanceX * distanceX + distanceY * distanceY;
-	      return distanceSquared < ball.radius * ball.radius;
-	    }
-	  }, {
-	    key: 'whichSide',
-	    value: function whichSide(block) {
-	      var ball = this;
-	      // distance from ball 'edges' to these block edges
-	      var bottom = block.y + block.height - (ball.y - ball.radius);
-	      var top = ball.y + ball.radius - block.y;
-	      var left = ball.x + ball.radius - block.x;
-	      var right = block.x + block.width - (ball.x - ball.radius);
-
-	      this.slowDownBall();
-
-	      // if top or bottom is 'smaller' than left or right
-	      if (top < bottom && top < left && top < right || bottom < top && bottom < left && bottom < right) {
-	        ball.ySpeed *= -1;
-	      } else {
-	        ball.xSpeed *= -1;
-	      }
-	    }
-	  }, {
-	    key: 'checkPlayers',
-	    value: function checkPlayers(players) {
-	      var ball = this;
-	      players.forEach(function (player) {
-	        if (player.status == 1) {
-	          ball.checkPaddles(player.paddle);
-	          if (ball.intersects(player)) {
-	            player.status = 0;
-	          }
-	        }
-	      });
-	    }
-	  }, {
-	    key: 'top',
-	    value: function top() {
-	      return this.y - this.radius;
-	    }
-	  }, {
-	    key: 'bottom',
-	    value: function bottom() {
-	      return this.y + this.radius;
-	    }
-	  }, {
-	    key: 'left',
-	    value: function left() {
-	      return this.x - this.radius;
-	    }
-	  }, {
-	    key: 'right',
-	    value: function right() {
-	      return this.x + this.radius;
-	    }
-	  }, {
-	    key: 'checkPaddles',
-	    value: function checkPaddles(paddle) {
-	      var self = this;
-	      if (self.right() > paddle.x && self.left() < paddle.right() && self.bottom() > paddle.y && self.top() < paddle.bottom()) {
-	        if (paddle.vertical) {
-	          self.ySpeed += paddle.dy / 2;
-	          self.xSpeed *= -1;
-	        } else {
-	          self.xSpeed += paddle.dx / 2;
-	          self.ySpeed *= -1;
-	        }
-	      }
-	    }
-	  }, {
-	    key: 'slowDownBall',
-	    value: function slowDownBall() {
-	      var m = this.calculateMomentum();
-	      if (m > 10 || m < -10) {
-	        this.xSpeed = this.xSpeed / 2;
-	        this.ySpeed = this.ySpeed / 2;
-	        this.slowDownBall();
-	      }
-	    }
-	  }, {
-	    key: 'calculateMomentum',
-	    value: function calculateMomentum() {
-	      return Math.sqrt(Math.pow(this.xSpeed, 2) + Math.pow(this.ySpeed, 2));
-	    }
-	  }]);
-
-	  return Ball;
-	})();
-
-	function clamp(val, min, max) {
-	  return Math.max(min, Math.min(max, val));
-	}
-
-	function getRandomColor() {
-	  var letters = '0123456789ABCDEF'.split('');
-	  var color = '#';
-	  for (var i = 0; i < 6; i++) {
-	    color += letters[Math.floor(Math.random() * 16)];
-	  }
-	  return color;
-	}
-
-	module.exports = ball;
-
-/***/ },
-/* 3 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var block = (function () {
-	  function Block(x, y, dimension, color) {
-	    _classCallCheck(this, Block);
-
-	    this.x = x;
-	    this.y = y;
-	    this.width = dimension;
-	    this.height = dimension;
-	    this.color = color;
-	    this.render = true;
-	  }
-
-	  _createClass(Block, [{
-	    key: "draw",
-	    value: function draw(ctx) {
-	      if (this.render === true) {
-	        ctx.fillStyle = this.color;
-	        ctx.fillRect(this.x, this.y, this.width, this.height);
-	      }
-	      return this;
-	    }
-	  }]);
-
-	  return Block;
-	})();
-
-	module.exports = block;
-
-/***/ },
-/* 4 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	var paddle = (function () {
-	  function Paddle(playerNumber, canvas) {
-	    _classCallCheck(this, Paddle);
-
-	    this.player = playerNumber;
-	    this.canvas = canvas;
-	    this.paddleWidth = 60;
-	    this.paddleHeight = 8;
-	    this.leftPressed = false;
-	    this.rightPressed = false;
-	    this.vertical = false;
-	    this.x = this.setPaddleX();
-	    this.y = this.setPaddleY();
-	    this.oneThirdWidth = canvas / 3;
-	    this.oneThirdHeight = canvas / 3;
-	    this.dx = 0;
-	    this.dy = 0;
-	    this.rightKeyCode = this.setupRightKeyCode();
-	    this.leftKeyCode = this.setupLeftKeyCode();
-	    this.playerControlled = false;
-	  }
-
-	  _createClass(Paddle, [{
-	    key: 'update',
-	    value: function update(position) {
-	      if (position) {
-	        this.x = position.x;
-	        this.y = position.y;
-	        this.vertical = position.vertical;
-	      }
-	    }
-	  }, {
-	    key: 'draw',
-	    value: function draw(ctx, color, position) {
-	      ctx.beginPath();
-	      if (this.vertical) {
-	        ctx.rect(this.x, this.y, this.paddleHeight, this.paddleWidth);
-	      } else {
-	        ctx.rect(this.x, this.y, this.paddleWidth, this.paddleHeight);
-	      }
-	      ctx.fillStyle = color;
-	      ctx.fill();
-	      ctx.closePath();
-	      if (this.playerControlled) {
-	        this.move();
-	      } else {
-	        this.update(position);
-	      }
-	    }
-	  }, {
-	    key: 'move',
-	    value: function move() {
-	      this.dx = 0;
-	      this.dy = 0;
-	      if (this.player === 1) {
-	        if (this.rightPressed) {
-	          this.dx = 9;
-	          this.dy = -9;
-	          if (this.x > this.oneThirdWidth - this.paddleWidth && !this.vertical) {
-	            this.vertical = true;
-	            this.x = this.oneThirdWidth;
-	            this.y = this.oneThirdWidth - this.paddleWidth;
-	          } else if (this.vertical && this.y >= 0) {
-	            this.y -= 9;
-	          } else if (!this.vertical) {
-	            this.x += 9;
-	          }
-	        } else if (this.leftPressed && this.x > 0) {
-	          this.dx = -9;
-	          this.dy = 9;
-	          if (this.y > this.oneThirdWidth - this.paddleWidth && this.vertical) {
-	            this.vertical = false;
-	            this.x = this.oneThirdWidth - this.paddleWidth;
-	            this.y = this.setPaddleY();
-	          } else if (this.vertical) {
-	            this.y += 9;
-	          } else if (!this.vertical) {
-	            this.x -= 9;
-	          }
-	        }
-	      } else if (this.player === 2) {
-	        if (this.rightPressed && this.x < this.canvas - this.paddleWidth) {
-	          this.dx = 9;
-	          this.dy = 9;
-	          if (this.y > this.setPaddleY() - this.paddleWidth && this.vertical) {
-	            this.vertical = false;
-	            this.x = this.oneThirdWidth * 2;
-	            this.y = this.setPaddleY();
-	          } else if (this.vertical) {
-	            this.y += 9;
-	          } else if (!this.vertical) {
-	            this.x += 9;
-	          }
-	        } else if (this.leftPressed) {
-	          this.dx = -9;
-	          this.dy = -9;
-	          if (this.x < this.oneThirdWidth * 2) {
-	            this.vertical = true;
-	            this.x = this.oneThirdWidth * 2;
-	            this.y = this.setPaddleY() - this.paddleWidth;
-	          } else if (this.vertical && this.y > 0) {
-	            this.y -= 9;
-	          } else if (!this.vertical) {
-	            this.x -= 9;
-	          }
-	        }
-	      } else if (this.player === 3) {
-	        if (this.rightPressed) {
-	          this.dx = 9;
-	          this.dy = 9;
-	          if (this.x > this.oneThirdWidth - this.paddleWidth && !this.vertical) {
-	            this.vertical = true;
-	            this.x = this.oneThirdWidth;
-	            this.y = this.oneThirdHeight * 2;
-	          } else if (this.vertical && this.y + this.paddleWidth < this.canvas) {
-	            this.y += 9;
-	          } else if (!this.vertical) {
-	            this.x += 9;
-	          }
-	        } else if (this.leftPressed && this.x > 0) {
-	          this.dx = -9;
-	          this.dy = -9;
-	          if (this.y < this.oneThirdHeight * 2) {
-	            this.x = this.oneThirdWidth - this.paddleWidth;
-	            this.y = this.oneThirdHeight * 2;
-	            this.vertical = false;
-	          } else if (this.vertical) {
-	            this.y -= 9;
-	          } else if (!this.vertical) {
-	            this.x -= 9;
-	          }
-	        }
-	      } else if (this.player === 4) {
-	        if (this.rightPressed && this.x < this.canvas - this.paddleWidth) {
-	          this.dx = 9;
-	          this.dy = -9;
-	          if (this.y < this.oneThirdWidth * 2) {
-	            this.x = this.oneThirdWidth * 2;
-	            this.y = this.setPaddleY();
-	            this.vertical = false;
-	          } else if (this.vertical) {
-	            this.y -= 9;
-	          } else if (!this.vertical) {
-	            this.x += 9;
-	          }
-	        } else if (this.leftPressed) {
-	          this.dx = -9;
-	          this.dy = 9;
-	          if (this.x < this.oneThirdWidth * 2) {
-	            this.x = this.oneThirdWidth * 2;
-	            this.y = this.oneThirdHeight * 2;
-	            this.vertical = true;
-	          } else if (this.vertical && this.y < this.canvas - this.paddleWidth) {
-	            this.y += 9;
-	          } else if (!this.vertical) {
-	            this.x -= 9;
-	          }
-	        }
-	      }
-	    }
-	  }, {
-	    key: 'setPaddleX',
-	    value: function setPaddleX() {
-	      if (this.player === 1 || this.player === 3) {
-	        return 10;
-	      } else if (this.player === 2 || this.player === 4) {
-	        return this.canvas - 10 - this.paddleWidth;
-	      }
-	    }
-	  }, {
-	    key: 'setPaddleY',
-	    value: function setPaddleY() {
-	      if (this.player === 1 || this.player === 2) {
-	        return this.canvas / 3;
-	      } else if (this.player === 3 || this.player === 4) {
-	        return this.canvas / 3 * 2;
-	      }
-	    }
-	  }, {
-	    key: 'setupPaddleEventListeners',
-	    value: function setupPaddleEventListeners() {
-	      var self = this;
-	      $(document).on('keydown', function (e) {
-	        if (e.keyCode === self.rightKeyCode) {
-	          self.rightPressed = true;
-	        } else if (e.keyCode === self.leftKeyCode) {
-	          self.leftPressed = true;
-	        }
-	      });
-	      $(document).on('keyup', function (e) {
-	        if (e.keyCode === self.rightKeyCode) {
-	          self.rightPressed = false;
-	        } else if (e.keyCode === self.leftKeyCode) {
-	          self.leftPressed = false;
-	        }
-	      });
-	    }
-	  }, {
-	    key: 'setupLeftKeyCode',
-	    value: function setupLeftKeyCode() {
-	      if (this.player === 1) {
-	        return 37;
-	      } else if (this.player === 2) {
-	        return 81;
-	      } else if (this.player === 3) {
-	        return 88;
-	      } else if (this.player === 4) {
-	        return 78;
-	      }
-	    }
-	  }, {
-	    key: 'setupRightKeyCode',
-	    value: function setupRightKeyCode() {
-	      if (this.player === 1) {
-	        return 39;
-	      } else if (this.player === 2) {
-	        return 87;
-	      } else if (this.player === 3) {
-	        return 67;
-	      } else if (this.player === 4) {
-	        return 77;
-	      }
-	    }
-	  }, {
-	    key: 'bottom',
-	    value: function bottom() {
-	      if (this.vertical) {
-	        return this.y + this.paddleWidth;
-	      } else {
-	        return this.y + this.paddleHeight;
-	      }
-	    }
-	  }, {
-	    key: 'right',
-	    value: function right() {
-	      if (this.vertical) {
-	        return this.x + this.paddleHeight;
-	      } else {
-	        return this.x + this.paddleWidth;
-	      }
-	    }
-	  }]);
-
-	  return Paddle;
-	})();
-
-	module.exports = paddle;
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	var Paddle = __webpack_require__(4);
-
-	var player = (function () {
-	  function Player(num, x, y, dimension, canvas, color) {
-	    _classCallCheck(this, Player);
-
-	    this.status = 1;
-	    this.num = num;
-	    this.x = x;
-	    this.y = y;
-	    this.height = dimension;
-	    this.width = dimension;
-	    this.color = color;
-	    this.blocks = [];
-	    this.paddle = new Paddle(num, canvas);
-	  }
-
-	  _createClass(Player, [{
-	    key: 'draw',
-	    value: function draw(ctx, position) {
-	      this.blocks.forEach(function (block) {
-	        block.draw(ctx);
-	      });
-
-	      var imageObj = new Image();
-	      imageObj.src = '../images/Warlords_guy.jpg';
-
-	      ctx.drawImage(imageObj, this.x, this.y, this.width, this.height);
-
-	      if (this.status === 1) {
-	        this.paddle.draw(ctx, this.color, position);
-	      } else {
-	        ctx.globalAlpha = 0.5;
-	        ctx.fillStyle = 'red';
-	        ctx.fillRect(this.x, this.y, this.width, this.height);
-	        ctx.globalAlpha = 1;
-	      }
-
-	      return this;
-	    }
-	  }, {
-	    key: 'paddleListeners',
-	    value: function paddleListeners() {
-	      this.paddle.setupPaddleEventListeners();
-	    }
-	  }]);
-
-	  return Player;
-	})();
-
-	module.exports = player;
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
 	var playerSocket = (function () {
 	  function PlayerSocket() {
 	    _classCallCheck(this, PlayerSocket);
 
-	    this.socket = __webpack_require__(7)('http://127.0.0.1:3000');
+	    this.socket = __webpack_require__(2)();
 	    this.playerNumber = 0;
 	    this.paddleInfo = {};
+	    this.setupListeners();
 	  }
 
 	  _createClass(PlayerSocket, [{
-	    key: 'updatePaddlePositions',
-	    value: function updatePaddlePositions(myPaddle) {
+	    key: 'setupListeners',
+	    value: function setupListeners() {
 	      var self = this;
-	      this.socket.emit('paddle', myPaddle);
 	      this.socket.on('paddles', function (paddleInfo) {
 	        self.paddleInfo = paddleInfo;
 	      });
+	      this.socket.on('initialize', function (playerNumber) {
+	        self.playerNumber = playerNumber;
+	        // callback();
+	      });
+	    }
+	  }, {
+	    key: 'updatePaddlePositions',
+	    value: function updatePaddlePositions(myPaddle) {
+	      this.socket.emit('paddle', myPaddle);
+	      // this.socket.on('paddles', function(paddleInfo) {
+	      //   self.paddleInfo = paddleInfo;
+	      // });
 	    }
 	  }, {
 	    key: 'startFromSockets',
@@ -820,7 +117,7 @@
 	module.exports = playerSocket;
 
 /***/ },
-/* 7 */
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -828,10 +125,10 @@
 	 * Module dependencies.
 	 */
 
-	var url = __webpack_require__(8);
-	var parser = __webpack_require__(13);
-	var Manager = __webpack_require__(21);
-	var debug = __webpack_require__(10)('socket.io-client');
+	var url = __webpack_require__(3);
+	var parser = __webpack_require__(8);
+	var Manager = __webpack_require__(16);
+	var debug = __webpack_require__(5)('socket.io-client');
 
 	/**
 	 * Module exports.
@@ -913,12 +210,12 @@
 	 * @api public
 	 */
 
-	exports.Manager = __webpack_require__(21);
-	exports.Socket = __webpack_require__(47);
+	exports.Manager = __webpack_require__(16);
+	exports.Socket = __webpack_require__(42);
 
 
 /***/ },
-/* 8 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -926,8 +223,8 @@
 	 * Module dependencies.
 	 */
 
-	var parseuri = __webpack_require__(9);
-	var debug = __webpack_require__(10)('socket.io-client:url');
+	var parseuri = __webpack_require__(4);
+	var debug = __webpack_require__(5)('socket.io-client:url');
 
 	/**
 	 * Module exports.
@@ -1001,7 +298,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 9 */
+/* 4 */
 /***/ function(module, exports) {
 
 	/**
@@ -1046,7 +343,7 @@
 
 
 /***/ },
-/* 10 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1056,7 +353,7 @@
 	 * Expose `debug()` as the module.
 	 */
 
-	exports = module.exports = __webpack_require__(11);
+	exports = module.exports = __webpack_require__(6);
 	exports.log = log;
 	exports.formatArgs = formatArgs;
 	exports.save = save;
@@ -1220,7 +517,7 @@
 
 
 /***/ },
-/* 11 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1236,7 +533,7 @@
 	exports.disable = disable;
 	exports.enable = enable;
 	exports.enabled = enabled;
-	exports.humanize = __webpack_require__(12);
+	exports.humanize = __webpack_require__(7);
 
 	/**
 	 * The currently active debug mode names, and names to skip.
@@ -1423,7 +720,7 @@
 
 
 /***/ },
-/* 12 */
+/* 7 */
 /***/ function(module, exports) {
 
 	/**
@@ -1554,7 +851,7 @@
 
 
 /***/ },
-/* 13 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1562,12 +859,12 @@
 	 * Module dependencies.
 	 */
 
-	var debug = __webpack_require__(10)('socket.io-parser');
-	var json = __webpack_require__(14);
-	var isArray = __webpack_require__(17);
-	var Emitter = __webpack_require__(18);
-	var binary = __webpack_require__(19);
-	var isBuf = __webpack_require__(20);
+	var debug = __webpack_require__(5)('socket.io-parser');
+	var json = __webpack_require__(9);
+	var isArray = __webpack_require__(12);
+	var Emitter = __webpack_require__(13);
+	var binary = __webpack_require__(14);
+	var isBuf = __webpack_require__(15);
 
 	/**
 	 * Protocol version.
@@ -1960,14 +1257,14 @@
 
 
 /***/ },
-/* 14 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*! JSON v3.3.2 | http://bestiejs.github.io/json3 | Copyright 2012-2014, Kit Cambridge | http://kit.mit-license.org */
 	;(function () {
 	  // Detect the `define` function exposed by asynchronous module loaders. The
 	  // strict `define` check is necessary for compatibility with `r.js`.
-	  var isLoader = "function" === "function" && __webpack_require__(16);
+	  var isLoader = "function" === "function" && __webpack_require__(11);
 
 	  // A set of types used to distinguish objects from primitives.
 	  var objectTypes = {
@@ -2866,10 +2163,10 @@
 	  }
 	}).call(this);
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)(module), (function() { return this; }())))
 
 /***/ },
-/* 15 */
+/* 10 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -2885,7 +2182,7 @@
 
 
 /***/ },
-/* 16 */
+/* 11 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
@@ -2893,7 +2190,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ },
-/* 17 */
+/* 12 */
 /***/ function(module, exports) {
 
 	module.exports = Array.isArray || function (arr) {
@@ -2902,7 +2199,7 @@
 
 
 /***/ },
-/* 18 */
+/* 13 */
 /***/ function(module, exports) {
 
 	
@@ -3072,7 +2369,7 @@
 
 
 /***/ },
-/* 19 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/*global Blob,File*/
@@ -3081,8 +2378,8 @@
 	 * Module requirements
 	 */
 
-	var isArray = __webpack_require__(17);
-	var isBuf = __webpack_require__(20);
+	var isArray = __webpack_require__(12);
+	var isBuf = __webpack_require__(15);
 
 	/**
 	 * Replaces every Buffer | ArrayBuffer in packet with a numbered placeholder.
@@ -3220,7 +2517,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 20 */
+/* 15 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -3240,7 +2537,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 21 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3248,15 +2545,15 @@
 	 * Module dependencies.
 	 */
 
-	var eio = __webpack_require__(22);
-	var Socket = __webpack_require__(47);
-	var Emitter = __webpack_require__(48);
-	var parser = __webpack_require__(13);
-	var on = __webpack_require__(50);
-	var bind = __webpack_require__(51);
-	var debug = __webpack_require__(10)('socket.io-client:manager');
-	var indexOf = __webpack_require__(45);
-	var Backoff = __webpack_require__(53);
+	var eio = __webpack_require__(17);
+	var Socket = __webpack_require__(42);
+	var Emitter = __webpack_require__(43);
+	var parser = __webpack_require__(8);
+	var on = __webpack_require__(45);
+	var bind = __webpack_require__(46);
+	var debug = __webpack_require__(5)('socket.io-client:manager');
+	var indexOf = __webpack_require__(40);
+	var Backoff = __webpack_require__(48);
 
 	/**
 	 * IE6+ hasOwnProperty
@@ -3803,19 +3100,19 @@
 
 
 /***/ },
-/* 22 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	module.exports =  __webpack_require__(23);
+	module.exports =  __webpack_require__(18);
 
 
 /***/ },
-/* 23 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	module.exports = __webpack_require__(24);
+	module.exports = __webpack_require__(19);
 
 	/**
 	 * Exports parser
@@ -3823,25 +3120,25 @@
 	 * @api public
 	 *
 	 */
-	module.exports.parser = __webpack_require__(31);
+	module.exports.parser = __webpack_require__(26);
 
 
 /***/ },
-/* 24 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Module dependencies.
 	 */
 
-	var transports = __webpack_require__(25);
-	var Emitter = __webpack_require__(18);
-	var debug = __webpack_require__(10)('engine.io-client:socket');
-	var index = __webpack_require__(45);
-	var parser = __webpack_require__(31);
-	var parseuri = __webpack_require__(9);
-	var parsejson = __webpack_require__(46);
-	var parseqs = __webpack_require__(39);
+	var transports = __webpack_require__(20);
+	var Emitter = __webpack_require__(13);
+	var debug = __webpack_require__(5)('engine.io-client:socket');
+	var index = __webpack_require__(40);
+	var parser = __webpack_require__(26);
+	var parseuri = __webpack_require__(4);
+	var parsejson = __webpack_require__(41);
+	var parseqs = __webpack_require__(34);
 
 	/**
 	 * Module exports.
@@ -3965,9 +3262,9 @@
 	 */
 
 	Socket.Socket = Socket;
-	Socket.Transport = __webpack_require__(30);
-	Socket.transports = __webpack_require__(25);
-	Socket.parser = __webpack_require__(31);
+	Socket.Transport = __webpack_require__(25);
+	Socket.transports = __webpack_require__(20);
+	Socket.parser = __webpack_require__(26);
 
 	/**
 	 * Creates transport of the given type.
@@ -4562,17 +3859,17 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 25 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Module dependencies
 	 */
 
-	var XMLHttpRequest = __webpack_require__(26);
-	var XHR = __webpack_require__(28);
-	var JSONP = __webpack_require__(42);
-	var websocket = __webpack_require__(43);
+	var XMLHttpRequest = __webpack_require__(21);
+	var XHR = __webpack_require__(23);
+	var JSONP = __webpack_require__(37);
+	var websocket = __webpack_require__(38);
 
 	/**
 	 * Export transports.
@@ -4622,11 +3919,11 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 26 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// browser shim for xmlhttprequest module
-	var hasCORS = __webpack_require__(27);
+	var hasCORS = __webpack_require__(22);
 
 	module.exports = function(opts) {
 	  var xdomain = opts.xdomain;
@@ -4664,7 +3961,7 @@
 
 
 /***/ },
-/* 27 */
+/* 22 */
 /***/ function(module, exports) {
 
 	
@@ -4687,18 +3984,18 @@
 
 
 /***/ },
-/* 28 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Module requirements.
 	 */
 
-	var XMLHttpRequest = __webpack_require__(26);
-	var Polling = __webpack_require__(29);
-	var Emitter = __webpack_require__(18);
-	var inherit = __webpack_require__(40);
-	var debug = __webpack_require__(10)('engine.io-client:polling-xhr');
+	var XMLHttpRequest = __webpack_require__(21);
+	var Polling = __webpack_require__(24);
+	var Emitter = __webpack_require__(13);
+	var inherit = __webpack_require__(35);
+	var debug = __webpack_require__(5)('engine.io-client:polling-xhr');
 
 	/**
 	 * Module exports.
@@ -5106,19 +4403,19 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 29 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * Module dependencies.
 	 */
 
-	var Transport = __webpack_require__(30);
-	var parseqs = __webpack_require__(39);
-	var parser = __webpack_require__(31);
-	var inherit = __webpack_require__(40);
-	var yeast = __webpack_require__(41);
-	var debug = __webpack_require__(10)('engine.io-client:polling');
+	var Transport = __webpack_require__(25);
+	var parseqs = __webpack_require__(34);
+	var parser = __webpack_require__(26);
+	var inherit = __webpack_require__(35);
+	var yeast = __webpack_require__(36);
+	var debug = __webpack_require__(5)('engine.io-client:polling');
 
 	/**
 	 * Module exports.
@@ -5131,7 +4428,7 @@
 	 */
 
 	var hasXHR2 = (function() {
-	  var XMLHttpRequest = __webpack_require__(26);
+	  var XMLHttpRequest = __webpack_require__(21);
 	  var xhr = new XMLHttpRequest({ xdomain: false });
 	  return null != xhr.responseType;
 	})();
@@ -5359,15 +4656,15 @@
 
 
 /***/ },
-/* 30 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * Module dependencies.
 	 */
 
-	var parser = __webpack_require__(31);
-	var Emitter = __webpack_require__(18);
+	var parser = __webpack_require__(26);
+	var Emitter = __webpack_require__(13);
 
 	/**
 	 * Module exports.
@@ -5520,19 +4817,19 @@
 
 
 /***/ },
-/* 31 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Module dependencies.
 	 */
 
-	var keys = __webpack_require__(32);
-	var hasBinary = __webpack_require__(33);
-	var sliceBuffer = __webpack_require__(34);
-	var base64encoder = __webpack_require__(35);
-	var after = __webpack_require__(36);
-	var utf8 = __webpack_require__(37);
+	var keys = __webpack_require__(27);
+	var hasBinary = __webpack_require__(28);
+	var sliceBuffer = __webpack_require__(29);
+	var base64encoder = __webpack_require__(30);
+	var after = __webpack_require__(31);
+	var utf8 = __webpack_require__(32);
 
 	/**
 	 * Check if we are running an android browser. That requires us to use
@@ -5589,7 +4886,7 @@
 	 * Create a blob api even for blob builder when vendor prefixes exist
 	 */
 
-	var Blob = __webpack_require__(38);
+	var Blob = __webpack_require__(33);
 
 	/**
 	 * Encodes a packet.
@@ -6121,7 +5418,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 32 */
+/* 27 */
 /***/ function(module, exports) {
 
 	
@@ -6146,7 +5443,7 @@
 
 
 /***/ },
-/* 33 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -6154,7 +5451,7 @@
 	 * Module requirements.
 	 */
 
-	var isArray = __webpack_require__(17);
+	var isArray = __webpack_require__(12);
 
 	/**
 	 * Module exports.
@@ -6211,7 +5508,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 34 */
+/* 29 */
 /***/ function(module, exports) {
 
 	/**
@@ -6246,7 +5543,7 @@
 
 
 /***/ },
-/* 35 */
+/* 30 */
 /***/ function(module, exports) {
 
 	/*
@@ -6311,7 +5608,7 @@
 
 
 /***/ },
-/* 36 */
+/* 31 */
 /***/ function(module, exports) {
 
 	module.exports = after
@@ -6345,7 +5642,7 @@
 
 
 /***/ },
-/* 37 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*! https://mths.be/utf8js v2.0.0 by @mathias */
@@ -6591,10 +5888,10 @@
 
 	}(this));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)(module), (function() { return this; }())))
 
 /***/ },
-/* 38 */
+/* 33 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -6697,7 +5994,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 39 */
+/* 34 */
 /***/ function(module, exports) {
 
 	/**
@@ -6740,7 +6037,7 @@
 
 
 /***/ },
-/* 40 */
+/* 35 */
 /***/ function(module, exports) {
 
 	
@@ -6752,7 +6049,7 @@
 	};
 
 /***/ },
-/* 41 */
+/* 36 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -6826,7 +6123,7 @@
 
 
 /***/ },
-/* 42 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -6834,8 +6131,8 @@
 	 * Module requirements.
 	 */
 
-	var Polling = __webpack_require__(29);
-	var inherit = __webpack_require__(40);
+	var Polling = __webpack_require__(24);
+	var inherit = __webpack_require__(35);
 
 	/**
 	 * Module exports.
@@ -7071,19 +6368,19 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 43 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Module dependencies.
 	 */
 
-	var Transport = __webpack_require__(30);
-	var parser = __webpack_require__(31);
-	var parseqs = __webpack_require__(39);
-	var inherit = __webpack_require__(40);
-	var yeast = __webpack_require__(41);
-	var debug = __webpack_require__(10)('engine.io-client:websocket');
+	var Transport = __webpack_require__(25);
+	var parser = __webpack_require__(26);
+	var parseqs = __webpack_require__(34);
+	var inherit = __webpack_require__(35);
+	var yeast = __webpack_require__(36);
+	var debug = __webpack_require__(5)('engine.io-client:websocket');
 	var BrowserWebSocket = global.WebSocket || global.MozWebSocket;
 
 	/**
@@ -7095,7 +6392,7 @@
 	var WebSocket = BrowserWebSocket;
 	if (!WebSocket && typeof window === 'undefined') {
 	  try {
-	    WebSocket = __webpack_require__(44);
+	    WebSocket = __webpack_require__(39);
 	  } catch (e) { }
 	}
 
@@ -7366,13 +6663,13 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 44 */
+/* 39 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 45 */
+/* 40 */
 /***/ function(module, exports) {
 
 	
@@ -7387,7 +6684,7 @@
 	};
 
 /***/ },
-/* 46 */
+/* 41 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -7425,7 +6722,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 47 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -7433,13 +6730,13 @@
 	 * Module dependencies.
 	 */
 
-	var parser = __webpack_require__(13);
-	var Emitter = __webpack_require__(48);
-	var toArray = __webpack_require__(49);
-	var on = __webpack_require__(50);
-	var bind = __webpack_require__(51);
-	var debug = __webpack_require__(10)('socket.io-client:socket');
-	var hasBin = __webpack_require__(52);
+	var parser = __webpack_require__(8);
+	var Emitter = __webpack_require__(43);
+	var toArray = __webpack_require__(44);
+	var on = __webpack_require__(45);
+	var bind = __webpack_require__(46);
+	var debug = __webpack_require__(5)('socket.io-client:socket');
+	var hasBin = __webpack_require__(47);
 
 	/**
 	 * Module exports.
@@ -7843,7 +7140,7 @@
 
 
 /***/ },
-/* 48 */
+/* 43 */
 /***/ function(module, exports) {
 
 	
@@ -8010,7 +7307,7 @@
 
 
 /***/ },
-/* 49 */
+/* 44 */
 /***/ function(module, exports) {
 
 	module.exports = toArray
@@ -8029,7 +7326,7 @@
 
 
 /***/ },
-/* 50 */
+/* 45 */
 /***/ function(module, exports) {
 
 	
@@ -8059,7 +7356,7 @@
 
 
 /***/ },
-/* 51 */
+/* 46 */
 /***/ function(module, exports) {
 
 	/**
@@ -8088,7 +7385,7 @@
 
 
 /***/ },
-/* 52 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -8096,7 +7393,7 @@
 	 * Module requirements.
 	 */
 
-	var isArray = __webpack_require__(17);
+	var isArray = __webpack_require__(12);
 
 	/**
 	 * Module exports.
@@ -8154,7 +7451,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 53 */
+/* 48 */
 /***/ function(module, exports) {
 
 	
@@ -8243,6 +7540,741 @@
 	};
 
 
+
+/***/ },
+/* 49 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var Ball = __webpack_require__(50);
+	var Block = __webpack_require__(51);
+	var Paddle = __webpack_require__(52);
+	var Player = __webpack_require__(53);
+	var Socket = __webpack_require__(1);
+
+	var game = (function () {
+	  function Game(ctx, canvas, socket) {
+	    _classCallCheck(this, Game);
+
+	    this.ctx = ctx;
+	    this.canvas = canvas;
+	    this.balls = [];
+	    this.paddles = [];
+	    this.players = [];
+	    this.cornerSize = 5;
+	    this.playerSize = 2;
+	    this.blockSize = 42;
+	    this.socket = socket;
+	  }
+
+	  _createClass(Game, [{
+	    key: 'beginLocalRound',
+	    value: function beginLocalRound() {
+	      var game = this;
+	      game.ctx.shadowColor = 'white';
+	      game.ctx.shadowBlur = 15;
+	      game.createGrid();
+	      game.balls.push(new Ball(275, 390, 10, 6, -3));
+	      setInterval(function () {
+	        game.balls.push(new Ball(375, 530, 10, -3, -4));
+	      }, 20000);
+
+	      requestAnimationFrame(function gameTime() {
+	        game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
+	        game.players.forEach(function (player) {
+	          player.draw(game.ctx);
+	        });
+	        game.balls.forEach(function (ball) {
+	          ball.draw(game.ctx).move(game.paddles, game.players, game.canvas);
+	        });
+
+	        if (game.players.filter(function (player) {
+	          return player.status === 1;
+	        }).length === 1) {
+	          game.players.forEach(function (player) {
+	            player.draw(game.ctx);
+	          });
+	          cancelAnimationFrame();
+	        } else {
+	          requestAnimationFrame(gameTime);
+	        }
+	      });
+	    }
+	  }, {
+	    key: 'beginOnlineRound',
+	    value: function beginOnlineRound() {
+	      var game = this;
+	      game.ctx.shadowColor = 'white';
+	      game.ctx.shadowBlur = 15;
+	      game.createGrid();
+	      var myPaddle = game.determinePaddle();
+	      myPaddle.playerControlled = true;
+	      game.socket.socket.on('ready', function () {
+	        game.balls.push(new Ball(275, 390, 10, 6, -3));
+	        setInterval(function () {
+	          game.balls.push(new Ball(375, 530, 10, -3, -4));
+	        }, 20000);
+	      });
+
+	      requestAnimationFrame(function gameTime() {
+	        game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
+	        game.players.forEach(function (player) {
+	          // console.log(game.socket.paddleInfo[player.num]);
+	          player.draw(game.ctx, game.socket.paddleInfo[player.num]);
+	        });
+	        game.balls.forEach(function (ball) {
+	          ball.draw(game.ctx).move(game.paddles, game.players, game.canvas);
+	        });
+	        game.socket.updatePaddlePositions(myPaddle);
+
+	        if (game.players.filter(function (player) {
+	          return player.status === 1;
+	        }).length === 1) {
+	          game.players.forEach(function (player) {
+	            player.draw(game.ctx);
+	          });
+	          cancelAnimationFrame();
+	        } else {
+	          requestAnimationFrame(gameTime);
+	        }
+	      });
+	    }
+	  }, {
+	    key: 'determinePaddle',
+	    value: function determinePaddle() {
+	      var number = this.socket.playerNumber;
+	      if (number === 1) {
+	        return this.players[0].paddle;
+	      } else if (number === 2) {
+	        return this.players[1].paddle;
+	      } else if (number === 3) {
+	        return this.players[2].paddle;
+	      } else if (number === 4) {
+	        return this.players[3].paddle;
+	      }
+	    }
+	  }, {
+	    key: 'createGrid',
+	    value: function createGrid() {
+	      var canvasSize = this.canvas.width;
+	      var blockSize = this.blockSize;
+	      var playerSpace = blockSize * this.playerSize;
+	      var numBlocks = this.cornerSize;
+	      var deadSpace = canvasSize - blockSize * numBlocks;
+
+	      this.players.push(new Player(1, 0, 0, playerSpace, canvasSize, '#00DD6B'));
+	      this.players.push(new Player(2, canvasSize - playerSpace, 0, playerSpace, canvasSize, '#DCED31'));
+	      this.players.push(new Player(3, 0, canvasSize - playerSpace, playerSpace, canvasSize, '#FF3864'));
+	      this.players.push(new Player(4, canvasSize - playerSpace, canvasSize - playerSpace, playerSpace, canvasSize, '#00A5FF'));
+
+	      this.players.forEach(function (player) {
+	        player.paddleListeners();
+	      });
+
+	      for (var y = 0; y < numBlocks; y++) {
+	        for (var x = 0; x < numBlocks; x++) {
+	          // Top Left
+	          if (x * blockSize >= playerSpace || y * blockSize >= playerSpace) {
+	            this.players[0].blocks.push(new Block(x * blockSize, y * blockSize, blockSize, this.players[0].color));
+	          }
+	          // Top Right
+	          if ((x + 1) * blockSize + deadSpace <= canvasSize - playerSpace || y * blockSize >= playerSpace) {
+	            this.players[1].blocks.push(new Block(deadSpace + x * blockSize, y * blockSize, blockSize, this.players[1].color));
+	          }
+	          // Bottom Left
+	          if (x * blockSize >= playerSpace || (y + 1) * blockSize + deadSpace <= canvasSize - playerSpace) {
+	            this.players[2].blocks.push(new Block(x * blockSize, deadSpace + y * blockSize, blockSize, this.players[2].color));
+	          }
+	          // Bottom Right
+	          if ((x + 1) * blockSize + deadSpace <= canvasSize - playerSpace || (y + 1) * blockSize + deadSpace <= canvasSize - playerSpace) {
+	            this.players[3].blocks.push(new Block(deadSpace + x * blockSize, deadSpace + y * blockSize, blockSize, this.players[3].color));
+	          }
+	        }
+	      }
+	    }
+	  }]);
+
+	  return Game;
+	})();
+
+	function random() {
+	  return Math.random() < 0.5 ? -1 : 1;
+	  return Math.random() * (6 - min) + min;
+	}
+
+	module.exports = game;
+
+/***/ },
+/* 50 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var ball = (function () {
+	  function Ball(xStart, yStart, radius, xSpeed, ySpeed) {
+	    _classCallCheck(this, Ball);
+
+	    this.x = xStart;
+	    this.y = yStart;
+	    this.radius = radius;
+	    this.xSpeed = xSpeed;
+	    this.ySpeed = ySpeed;
+	    this.collided = false;
+	  }
+
+	  _createClass(Ball, [{
+	    key: 'draw',
+	    value: function draw(ctx) {
+	      ctx.beginPath();
+	      ctx.fillStyle = 'white';
+	      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+	      ctx.fill();
+	      return this;
+	    }
+	  }, {
+	    key: 'move',
+	    value: function move(paddles, players, canvas) {
+	      this.wallCollision(canvas);
+	      this.checkQuadrant(players, canvas);
+	      this.checkPlayers(players);
+	      this.x += this.xSpeed;
+	      this.y += this.ySpeed;
+	      return this;
+	    }
+	  }, {
+	    key: 'wallCollision',
+	    value: function wallCollision(canvas) {
+	      //left or right
+	      if (this.x + this.xSpeed > canvas.width - this.radius || this.x + this.xSpeed < 0 + this.radius) {
+	        this.xSpeed *= -1;
+	      }
+	      //top or bottom
+	      if (this.y + this.ySpeed > canvas.height - this.radius || this.y + this.ySpeed < 0 + this.radius) {
+
+	        this.ySpeed *= -1;
+	      }
+	    }
+	  }, {
+	    key: 'checkQuadrant',
+	    value: function checkQuadrant(players, canvas) {
+	      var ball = this;
+	      ball.collided = false;
+	      if (ball.y < canvas.height / 2) {
+	        if (ball.x < canvas.width / 2) {
+	          players[0].blocks.forEach(function (block) {
+	            ball.blockCollision(block);
+	          });
+	        } else {
+	          players[1].blocks.forEach(function (block) {
+	            ball.blockCollision(block);
+	          });
+	        }
+	      } else {
+	        if (ball.x < canvas.width / 2) {
+	          players[2].blocks.forEach(function (block) {
+	            ball.blockCollision(block);
+	          });
+	        } else {
+	          players[3].blocks.forEach(function (block) {
+	            ball.blockCollision(block);
+	          });
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'blockCollision',
+	    value: function blockCollision(block) {
+	      if (this.collided === false && block.render === true && this.intersects(block)) {
+	        this.collided = true;
+	        block.render = false;
+
+	        this.whichSide(block);
+	      }
+	    }
+	  }, {
+	    key: 'intersects',
+	    value: function intersects(block) {
+	      var ball = this;
+	      // Find the closest point to the circle within the rectangle
+	      // Consider refactoring to use this calculation to determine closest edge / corner
+	      // ie: if(closestX < closestY){ball.xSpeed = -ball.xSpeed} else {ball.ySpeed = -ball.ySpeed;}
+	      var closestX = clamp(ball.x, block.x, block.x + block.width);
+	      var closestY = clamp(ball.y, block.y, block.y + block.height);
+	      // Calculate the distance between the circle's center and ball closest point
+	      var distanceX = ball.x - closestX;
+	      var distanceY = ball.y - closestY;
+
+	      // If the distance is less than the circle's radius, an intersection occurs
+	      var distanceSquared = distanceX * distanceX + distanceY * distanceY;
+	      return distanceSquared < ball.radius * ball.radius;
+	    }
+	  }, {
+	    key: 'whichSide',
+	    value: function whichSide(block) {
+	      var ball = this;
+	      // distance from ball 'edges' to these block edges
+	      var bottom = block.y + block.height - (ball.y - ball.radius);
+	      var top = ball.y + ball.radius - block.y;
+	      var left = ball.x + ball.radius - block.x;
+	      var right = block.x + block.width - (ball.x - ball.radius);
+
+	      this.slowDownBall();
+
+	      // if top or bottom is 'smaller' than left or right
+	      if (top < bottom && top < left && top < right || bottom < top && bottom < left && bottom < right) {
+	        ball.ySpeed *= -1;
+	      } else {
+	        ball.xSpeed *= -1;
+	      }
+	    }
+	  }, {
+	    key: 'checkPlayers',
+	    value: function checkPlayers(players) {
+	      var ball = this;
+	      players.forEach(function (player) {
+	        if (player.status == 1) {
+	          ball.checkPaddles(player.paddle);
+	          if (ball.intersects(player)) {
+	            player.status = 0;
+	          }
+	        }
+	      });
+	    }
+	  }, {
+	    key: 'top',
+	    value: function top() {
+	      return this.y - this.radius;
+	    }
+	  }, {
+	    key: 'bottom',
+	    value: function bottom() {
+	      return this.y + this.radius;
+	    }
+	  }, {
+	    key: 'left',
+	    value: function left() {
+	      return this.x - this.radius;
+	    }
+	  }, {
+	    key: 'right',
+	    value: function right() {
+	      return this.x + this.radius;
+	    }
+	  }, {
+	    key: 'checkPaddles',
+	    value: function checkPaddles(paddle) {
+	      var self = this;
+	      if (self.right() > paddle.x && self.left() < paddle.right() && self.bottom() > paddle.y && self.top() < paddle.bottom()) {
+	        if (paddle.vertical) {
+	          self.ySpeed += paddle.dy / 2;
+	          self.xSpeed *= -1;
+	        } else {
+	          self.xSpeed += paddle.dx / 2;
+	          self.ySpeed *= -1;
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'slowDownBall',
+	    value: function slowDownBall() {
+	      var m = this.calculateMomentum();
+	      if (m > 10 || m < -10) {
+	        this.xSpeed = this.xSpeed / 2;
+	        this.ySpeed = this.ySpeed / 2;
+	        this.slowDownBall();
+	      }
+	    }
+	  }, {
+	    key: 'calculateMomentum',
+	    value: function calculateMomentum() {
+	      return Math.sqrt(Math.pow(this.xSpeed, 2) + Math.pow(this.ySpeed, 2));
+	    }
+	  }]);
+
+	  return Ball;
+	})();
+
+	function clamp(val, min, max) {
+	  return Math.max(min, Math.min(max, val));
+	}
+
+	function getRandomColor() {
+	  var letters = '0123456789ABCDEF'.split('');
+	  var color = '#';
+	  for (var i = 0; i < 6; i++) {
+	    color += letters[Math.floor(Math.random() * 16)];
+	  }
+	  return color;
+	}
+
+	module.exports = ball;
+
+/***/ },
+/* 51 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var block = (function () {
+	  function Block(x, y, dimension, color) {
+	    _classCallCheck(this, Block);
+
+	    this.x = x;
+	    this.y = y;
+	    this.width = dimension;
+	    this.height = dimension;
+	    this.color = color;
+	    this.render = true;
+	  }
+
+	  _createClass(Block, [{
+	    key: "draw",
+	    value: function draw(ctx) {
+	      if (this.render === true) {
+	        ctx.fillStyle = this.color;
+	        ctx.fillRect(this.x, this.y, this.width, this.height);
+	      }
+	      return this;
+	    }
+	  }]);
+
+	  return Block;
+	})();
+
+	module.exports = block;
+
+/***/ },
+/* 52 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var paddle = (function () {
+	  function Paddle(playerNumber, canvas) {
+	    _classCallCheck(this, Paddle);
+
+	    this.player = playerNumber;
+	    this.canvas = canvas;
+	    this.paddleWidth = 60;
+	    this.paddleHeight = 8;
+	    this.leftPressed = false;
+	    this.rightPressed = false;
+	    this.vertical = false;
+	    this.x = this.setPaddleX();
+	    this.y = this.setPaddleY();
+	    this.oneThirdWidth = canvas / 3;
+	    this.oneThirdHeight = canvas / 3;
+	    this.dx = 0;
+	    this.dy = 0;
+	    this.rightKeyCode = this.setupRightKeyCode();
+	    this.leftKeyCode = this.setupLeftKeyCode();
+	    this.playerControlled = false;
+	  }
+
+	  _createClass(Paddle, [{
+	    key: 'update',
+	    value: function update(position) {
+	      if (position) {
+	        this.x = position.x;
+	        this.y = position.y;
+	        this.vertical = position.vertical;
+	      }
+	    }
+	  }, {
+	    key: 'draw',
+	    value: function draw(ctx, color, position) {
+	      ctx.beginPath();
+	      if (this.vertical) {
+	        ctx.rect(this.x, this.y, this.paddleHeight, this.paddleWidth);
+	      } else {
+	        ctx.rect(this.x, this.y, this.paddleWidth, this.paddleHeight);
+	      }
+	      ctx.fillStyle = color;
+	      ctx.fill();
+	      ctx.closePath();
+	      if (this.playerControlled) {
+	        this.move();
+	      } else {
+	        this.update(position);
+	      }
+	    }
+	  }, {
+	    key: 'move',
+	    value: function move() {
+	      this.dx = 0;
+	      this.dy = 0;
+	      if (this.player === 1) {
+	        if (this.rightPressed) {
+	          this.dx = 9;
+	          this.dy = -9;
+	          if (this.x > this.oneThirdWidth - this.paddleWidth && !this.vertical) {
+	            this.vertical = true;
+	            this.x = this.oneThirdWidth;
+	            this.y = this.oneThirdWidth - this.paddleWidth;
+	          } else if (this.vertical && this.y >= 0) {
+	            this.y -= 9;
+	          } else if (!this.vertical) {
+	            this.x += 9;
+	          }
+	        } else if (this.leftPressed && this.x > 0) {
+	          this.dx = -9;
+	          this.dy = 9;
+	          if (this.y > this.oneThirdWidth - this.paddleWidth && this.vertical) {
+	            this.vertical = false;
+	            this.x = this.oneThirdWidth - this.paddleWidth;
+	            this.y = this.setPaddleY();
+	          } else if (this.vertical) {
+	            this.y += 9;
+	          } else if (!this.vertical) {
+	            this.x -= 9;
+	          }
+	        }
+	      } else if (this.player === 2) {
+	        if (this.rightPressed && this.x < this.canvas - this.paddleWidth) {
+	          this.dx = 9;
+	          this.dy = 9;
+	          if (this.y > this.setPaddleY() - this.paddleWidth && this.vertical) {
+	            this.vertical = false;
+	            this.x = this.oneThirdWidth * 2;
+	            this.y = this.setPaddleY();
+	          } else if (this.vertical) {
+	            this.y += 9;
+	          } else if (!this.vertical) {
+	            this.x += 9;
+	          }
+	        } else if (this.leftPressed) {
+	          this.dx = -9;
+	          this.dy = -9;
+	          if (this.x < this.oneThirdWidth * 2) {
+	            this.vertical = true;
+	            this.x = this.oneThirdWidth * 2;
+	            this.y = this.setPaddleY() - this.paddleWidth;
+	          } else if (this.vertical && this.y > 0) {
+	            this.y -= 9;
+	          } else if (!this.vertical) {
+	            this.x -= 9;
+	          }
+	        }
+	      } else if (this.player === 3) {
+	        if (this.rightPressed) {
+	          this.dx = 9;
+	          this.dy = 9;
+	          if (this.x > this.oneThirdWidth - this.paddleWidth && !this.vertical) {
+	            this.vertical = true;
+	            this.x = this.oneThirdWidth;
+	            this.y = this.oneThirdHeight * 2;
+	          } else if (this.vertical && this.y + this.paddleWidth < this.canvas) {
+	            this.y += 9;
+	          } else if (!this.vertical) {
+	            this.x += 9;
+	          }
+	        } else if (this.leftPressed && this.x > 0) {
+	          this.dx = -9;
+	          this.dy = -9;
+	          if (this.y < this.oneThirdHeight * 2) {
+	            this.x = this.oneThirdWidth - this.paddleWidth;
+	            this.y = this.oneThirdHeight * 2;
+	            this.vertical = false;
+	          } else if (this.vertical) {
+	            this.y -= 9;
+	          } else if (!this.vertical) {
+	            this.x -= 9;
+	          }
+	        }
+	      } else if (this.player === 4) {
+	        if (this.rightPressed && this.x < this.canvas - this.paddleWidth) {
+	          this.dx = 9;
+	          this.dy = -9;
+	          if (this.y < this.oneThirdWidth * 2) {
+	            this.x = this.oneThirdWidth * 2;
+	            this.y = this.setPaddleY();
+	            this.vertical = false;
+	          } else if (this.vertical) {
+	            this.y -= 9;
+	          } else if (!this.vertical) {
+	            this.x += 9;
+	          }
+	        } else if (this.leftPressed) {
+	          this.dx = -9;
+	          this.dy = 9;
+	          if (this.x < this.oneThirdWidth * 2) {
+	            this.x = this.oneThirdWidth * 2;
+	            this.y = this.oneThirdHeight * 2;
+	            this.vertical = true;
+	          } else if (this.vertical && this.y < this.canvas - this.paddleWidth) {
+	            this.y += 9;
+	          } else if (!this.vertical) {
+	            this.x -= 9;
+	          }
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'setPaddleX',
+	    value: function setPaddleX() {
+	      if (this.player === 1 || this.player === 3) {
+	        return 10;
+	      } else if (this.player === 2 || this.player === 4) {
+	        return this.canvas - 10 - this.paddleWidth;
+	      }
+	    }
+	  }, {
+	    key: 'setPaddleY',
+	    value: function setPaddleY() {
+	      if (this.player === 1 || this.player === 2) {
+	        return this.canvas / 3;
+	      } else if (this.player === 3 || this.player === 4) {
+	        return this.canvas / 3 * 2;
+	      }
+	    }
+	  }, {
+	    key: 'setupPaddleEventListeners',
+	    value: function setupPaddleEventListeners() {
+	      var self = this;
+	      $(document).on('keydown', function (e) {
+	        if (e.keyCode === self.rightKeyCode) {
+	          self.rightPressed = true;
+	        } else if (e.keyCode === self.leftKeyCode) {
+	          self.leftPressed = true;
+	        }
+	      });
+	      $(document).on('keyup', function (e) {
+	        if (e.keyCode === self.rightKeyCode) {
+	          self.rightPressed = false;
+	        } else if (e.keyCode === self.leftKeyCode) {
+	          self.leftPressed = false;
+	        }
+	      });
+	    }
+	  }, {
+	    key: 'setupLeftKeyCode',
+	    value: function setupLeftKeyCode() {
+	      // if (this.player === 1) {
+	      return 37;
+	      // } else if (this.player === 2) {
+	      //   return 81;
+	      // } else if (this.player === 3) {
+	      //   return 88;
+	      // } else if (this.player === 4) {
+	      //   return 78;
+	      // }
+	    }
+	  }, {
+	    key: 'setupRightKeyCode',
+	    value: function setupRightKeyCode() {
+	      // if (this.player === 1) {
+	      return 39;
+	      // } else if (this.player === 2) {
+	      //   return 87;
+	      // } else if (this.player === 3) {
+	      //   return 67;
+	      // } else if (this.player === 4) {
+	      //   return 77;
+	      // }
+	    }
+	  }, {
+	    key: 'bottom',
+	    value: function bottom() {
+	      if (this.vertical) {
+	        return this.y + this.paddleWidth;
+	      } else {
+	        return this.y + this.paddleHeight;
+	      }
+	    }
+	  }, {
+	    key: 'right',
+	    value: function right() {
+	      if (this.vertical) {
+	        return this.x + this.paddleHeight;
+	      } else {
+	        return this.x + this.paddleWidth;
+	      }
+	    }
+	  }]);
+
+	  return Paddle;
+	})();
+
+	module.exports = paddle;
+
+/***/ },
+/* 53 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var Paddle = __webpack_require__(52);
+
+	var player = (function () {
+	  function Player(num, x, y, dimension, canvas, color) {
+	    _classCallCheck(this, Player);
+
+	    this.status = 1;
+	    this.num = num;
+	    this.x = x;
+	    this.y = y;
+	    this.height = dimension;
+	    this.width = dimension;
+	    this.color = color;
+	    this.blocks = [];
+	    this.paddle = new Paddle(num, canvas);
+	  }
+
+	  _createClass(Player, [{
+	    key: 'draw',
+	    value: function draw(ctx, position) {
+	      this.blocks.forEach(function (block) {
+	        block.draw(ctx);
+	      });
+
+	      var imageObj = new Image();
+	      imageObj.src = '../images/Warlords_guy.jpg';
+
+	      ctx.drawImage(imageObj, this.x, this.y, this.width, this.height);
+
+	      if (this.status === 1) {
+	        this.paddle.draw(ctx, this.color, position);
+	      } else {
+	        ctx.globalAlpha = 0.5;
+	        ctx.fillStyle = 'red';
+	        ctx.fillRect(this.x, this.y, this.width, this.height);
+	        ctx.globalAlpha = 1;
+	      }
+
+	      return this;
+	    }
+	  }, {
+	    key: 'paddleListeners',
+	    value: function paddleListeners() {
+	      this.paddle.setupPaddleEventListeners();
+	    }
+	  }]);
+
+	  return Player;
+	})();
+
+	module.exports = player;
 
 /***/ },
 /* 54 */
@@ -8547,7 +8579,7 @@
 
 	var chai = __webpack_require__(64);
 	var expect = chai.expect;
-	var Paddle = __webpack_require__(4);
+	var Paddle = __webpack_require__(52);
 	var canvas = 1000;
 	var paddle = new Paddle(1, canvas);
 
@@ -16832,7 +16864,7 @@
 
 	var assert = __webpack_require__(64).assert;
 
-	var Block = __webpack_require__(3);
+	var Block = __webpack_require__(51);
 
 	describe('Block', function () {
 	  context('should take attributes', function () {
@@ -16873,10 +16905,10 @@
 
 	var assert = __webpack_require__(64).assert;
 
-	var Ball = __webpack_require__(2);
-	var Block = __webpack_require__(3);
-	var Paddle = __webpack_require__(4);
-	var Player = __webpack_require__(5);
+	var Ball = __webpack_require__(50);
+	var Block = __webpack_require__(51);
+	var Paddle = __webpack_require__(52);
+	var Player = __webpack_require__(53);
 
 	describe('Ball', function () {
 	  var canvas = document.createElement('canvas');
@@ -17107,7 +17139,7 @@
 
 	var assert = __webpack_require__(64).assert;
 
-	var Game = __webpack_require__(1);
+	var Game = __webpack_require__(49);
 
 	describe('Game', function () {
 	  var canvas = document.createElement('canvas');
