@@ -100,7 +100,11 @@
 	  }, {
 	    key: 'updateBalls',
 	    value: function updateBalls(balls) {
-	      this.socket.emit('ballPositions', balls);
+	      var ballHashes = [];
+	      balls.forEach(function (ball) {
+	        ballHashes.push({ x: ball.x, y: ball.y, radius: ball.radius, xSpeed: ball.xSpeed, ySpeed: ball.ySpeed });
+	      });
+	      this.socket.emit('ballPositions', ballHashes);
 	    }
 	  }, {
 	    key: 'updatePaddlePositions',
