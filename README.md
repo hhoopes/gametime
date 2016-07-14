@@ -1,4 +1,8 @@
-# Game Time Starter Kit
+# Warlords
+
+Running live at [Jared's Github.io](jaredroth.github.io/warlords.html)
+
+Play with your friends!
 
 To install the dependencies:
 
