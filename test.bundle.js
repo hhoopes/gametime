@@ -181,10 +181,12 @@
 	      game.createGrid();
 	      var myPaddle = game.determinePaddle();
 	      myPaddle.playerControlled = true;
-	      game.socket.socket.on('ready', function () {
-	        game.balls.push(new Ball(275, 390, 10, 6, -3));
-	        this.ballSpawned = true;
-	      });
+	      if (game.socket.playerNumber === 1) {
+	        game.socket.socket.on('ready', function () {
+	          game.balls.push(new Ball(275, 390, 10, 6, -3));
+	          this.ballSpawned = true;
+	        });
+	      }
 
 	      requestAnimationFrame(function gameTime() {
 	        game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);

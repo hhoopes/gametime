@@ -48,6 +48,7 @@ io.on('connection', function(socket){
 
   socket.on('paddle', function(paddle){
     if (playerNumbers.length === 0 && readySignalSent === false) {
+      console.log('sending ready signal')
       readySignalSent = true;
       io.sockets.emit('ready', paddles);
     }
