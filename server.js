@@ -19,6 +19,10 @@ app.get('/warlords.js', function(req, res) {
   res.sendFile(__dirname + '/main.bundle.js');
 });
 
+app.get('/css/index.css', function(req, res) {
+  res.sendFile(__dirname + '/css/index.css');
+});
+
 
 app.get('/images/Warlords_guy.jpg', function(req, res) {
   res.sendFile(__dirname + '/images/Warlords_guy.jpg');
