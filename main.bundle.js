@@ -134,11 +134,11 @@
 	        game.balls.push(new Ball(275, 390, 10, 6, -3));
 	      }, 3000);
 	      setInterval(function () {
-	        // game.startTimer(game, 3)
-	        // setTimeout(function() {
-	        game.balls.push(new Ball(375, 530, 10, -3, -4));
-	        // }, 4000)
-	      }, 190);
+	        game.startTimer(game, 3);
+	        setTimeout(function () {
+	          game.balls.push(new Ball(375, 530, 10, -3, -4));
+	        }, 4000);
+	      }, 19000);
 
 	      requestAnimationFrame(function gameTime() {
 	        game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
