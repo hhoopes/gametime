@@ -50,7 +50,7 @@
 	var ctx = canvas.getContext('2d');
 	var Socket = __webpack_require__(1);
 
-	var Game = __webpack_require__(51);
+	var Game = __webpack_require__(49);
 
 	var socket = new Socket();
 
@@ -78,6 +78,7 @@
 	    this.playerNumber = 0;
 	    this.paddleInfo = {};
 	    this.setupListeners();
+	    this.ballSpawned = false;
 	  }
 
 	  _createClass(PlayerSocket, [{
@@ -93,12 +94,14 @@
 	      });
 	    }
 	  }, {
+	    key: 'updateBalls',
+	    value: function updateBalls(balls) {
+	      this.socket.emit('ballPositions', balls);
+	    }
+	  }, {
 	    key: 'updatePaddlePositions',
 	    value: function updatePaddlePositions(myPaddle) {
 	      this.socket.emit('paddle', myPaddle);
-	      // this.socket.on('paddles', function(paddleInfo) {
-	      //   self.paddleInfo = paddleInfo;
-	      // });
 	    }
 	  }, {
 	    key: 'startFromSockets',
@@ -212,7 +215,7 @@
 	 */
 
 	exports.Manager = __webpack_require__(16);
-	exports.Socket = __webpack_require__(43);
+	exports.Socket = __webpack_require__(42);
 
 
 /***/ },
@@ -2547,14 +2550,14 @@
 	 */
 
 	var eio = __webpack_require__(17);
-	var Socket = __webpack_require__(43);
-	var Emitter = __webpack_require__(44);
+	var Socket = __webpack_require__(42);
+	var Emitter = __webpack_require__(43);
 	var parser = __webpack_require__(8);
-	var on = __webpack_require__(46);
-	var bind = __webpack_require__(47);
+	var on = __webpack_require__(45);
+	var bind = __webpack_require__(46);
 	var debug = __webpack_require__(5)('socket.io-client:manager');
-	var indexOf = __webpack_require__(41);
-	var Backoff = __webpack_require__(50);
+	var indexOf = __webpack_require__(40);
+	var Backoff = __webpack_require__(48);
 
 	/**
 	 * IE6+ hasOwnProperty
@@ -3135,11 +3138,11 @@
 	var transports = __webpack_require__(20);
 	var Emitter = __webpack_require__(13);
 	var debug = __webpack_require__(5)('engine.io-client:socket');
-	var index = __webpack_require__(41);
+	var index = __webpack_require__(40);
 	var parser = __webpack_require__(26);
 	var parseuri = __webpack_require__(4);
-	var parsejson = __webpack_require__(42);
-	var parseqs = __webpack_require__(35);
+	var parsejson = __webpack_require__(41);
+	var parseqs = __webpack_require__(34);
 
 	/**
 	 * Module exports.
@@ -3869,8 +3872,8 @@
 
 	var XMLHttpRequest = __webpack_require__(21);
 	var XHR = __webpack_require__(23);
-	var JSONP = __webpack_require__(38);
-	var websocket = __webpack_require__(39);
+	var JSONP = __webpack_require__(37);
+	var websocket = __webpack_require__(38);
 
 	/**
 	 * Export transports.
@@ -3995,7 +3998,7 @@
 	var XMLHttpRequest = __webpack_require__(21);
 	var Polling = __webpack_require__(24);
 	var Emitter = __webpack_require__(13);
-	var inherit = __webpack_require__(36);
+	var inherit = __webpack_require__(35);
 	var debug = __webpack_require__(5)('engine.io-client:polling-xhr');
 
 	/**
@@ -4412,10 +4415,10 @@
 	 */
 
 	var Transport = __webpack_require__(25);
-	var parseqs = __webpack_require__(35);
+	var parseqs = __webpack_require__(34);
 	var parser = __webpack_require__(26);
-	var inherit = __webpack_require__(36);
-	var yeast = __webpack_require__(37);
+	var inherit = __webpack_require__(35);
+	var yeast = __webpack_require__(36);
 	var debug = __webpack_require__(5)('engine.io-client:polling');
 
 	/**
@@ -4827,10 +4830,10 @@
 
 	var keys = __webpack_require__(27);
 	var hasBinary = __webpack_require__(28);
-	var sliceBuffer = __webpack_require__(30);
-	var base64encoder = __webpack_require__(31);
-	var after = __webpack_require__(32);
-	var utf8 = __webpack_require__(33);
+	var sliceBuffer = __webpack_require__(29);
+	var base64encoder = __webpack_require__(30);
+	var after = __webpack_require__(31);
+	var utf8 = __webpack_require__(32);
 
 	/**
 	 * Check if we are running an android browser. That requires us to use
@@ -4887,7 +4890,7 @@
 	 * Create a blob api even for blob builder when vendor prefixes exist
 	 */
 
-	var Blob = __webpack_require__(34);
+	var Blob = __webpack_require__(33);
 
 	/**
 	 * Encodes a packet.
@@ -5452,7 +5455,7 @@
 	 * Module requirements.
 	 */
 
-	var isArray = __webpack_require__(29);
+	var isArray = __webpack_require__(12);
 
 	/**
 	 * Module exports.
@@ -5512,15 +5515,6 @@
 /* 29 */
 /***/ function(module, exports) {
 
-	module.exports = Array.isArray || function (arr) {
-	  return Object.prototype.toString.call(arr) == '[object Array]';
-	};
-
-
-/***/ },
-/* 30 */
-/***/ function(module, exports) {
-
 	/**
 	 * An abstraction for slicing an arraybuffer even when
 	 * ArrayBuffer.prototype.slice is not supported
@@ -5553,7 +5547,7 @@
 
 
 /***/ },
-/* 31 */
+/* 30 */
 /***/ function(module, exports) {
 
 	/*
@@ -5618,7 +5612,7 @@
 
 
 /***/ },
-/* 32 */
+/* 31 */
 /***/ function(module, exports) {
 
 	module.exports = after
@@ -5652,7 +5646,7 @@
 
 
 /***/ },
-/* 33 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*! https://mths.be/utf8js v2.0.0 by @mathias */
@@ -5901,7 +5895,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)(module), (function() { return this; }())))
 
 /***/ },
-/* 34 */
+/* 33 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -6004,7 +5998,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 35 */
+/* 34 */
 /***/ function(module, exports) {
 
 	/**
@@ -6047,7 +6041,7 @@
 
 
 /***/ },
-/* 36 */
+/* 35 */
 /***/ function(module, exports) {
 
 	
@@ -6059,7 +6053,7 @@
 	};
 
 /***/ },
-/* 37 */
+/* 36 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -6133,7 +6127,7 @@
 
 
 /***/ },
-/* 38 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -6142,7 +6136,7 @@
 	 */
 
 	var Polling = __webpack_require__(24);
-	var inherit = __webpack_require__(36);
+	var inherit = __webpack_require__(35);
 
 	/**
 	 * Module exports.
@@ -6378,7 +6372,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 39 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -6387,9 +6381,9 @@
 
 	var Transport = __webpack_require__(25);
 	var parser = __webpack_require__(26);
-	var parseqs = __webpack_require__(35);
-	var inherit = __webpack_require__(36);
-	var yeast = __webpack_require__(37);
+	var parseqs = __webpack_require__(34);
+	var inherit = __webpack_require__(35);
+	var yeast = __webpack_require__(36);
 	var debug = __webpack_require__(5)('engine.io-client:websocket');
 	var BrowserWebSocket = global.WebSocket || global.MozWebSocket;
 
@@ -6402,7 +6396,7 @@
 	var WebSocket = BrowserWebSocket;
 	if (!WebSocket && typeof window === 'undefined') {
 	  try {
-	    WebSocket = __webpack_require__(40);
+	    WebSocket = __webpack_require__(39);
 	  } catch (e) { }
 	}
 
@@ -6673,13 +6667,13 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 40 */
+/* 39 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 41 */
+/* 40 */
 /***/ function(module, exports) {
 
 	
@@ -6694,7 +6688,7 @@
 	};
 
 /***/ },
-/* 42 */
+/* 41 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -6732,7 +6726,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 43 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -6741,12 +6735,12 @@
 	 */
 
 	var parser = __webpack_require__(8);
-	var Emitter = __webpack_require__(44);
-	var toArray = __webpack_require__(45);
-	var on = __webpack_require__(46);
-	var bind = __webpack_require__(47);
+	var Emitter = __webpack_require__(43);
+	var toArray = __webpack_require__(44);
+	var on = __webpack_require__(45);
+	var bind = __webpack_require__(46);
 	var debug = __webpack_require__(5)('socket.io-client:socket');
-	var hasBin = __webpack_require__(48);
+	var hasBin = __webpack_require__(47);
 
 	/**
 	 * Module exports.
@@ -7150,7 +7144,7 @@
 
 
 /***/ },
-/* 44 */
+/* 43 */
 /***/ function(module, exports) {
 
 	
@@ -7317,7 +7311,7 @@
 
 
 /***/ },
-/* 45 */
+/* 44 */
 /***/ function(module, exports) {
 
 	module.exports = toArray
@@ -7336,7 +7330,7 @@
 
 
 /***/ },
-/* 46 */
+/* 45 */
 /***/ function(module, exports) {
 
 	
@@ -7366,7 +7360,7 @@
 
 
 /***/ },
-/* 47 */
+/* 46 */
 /***/ function(module, exports) {
 
 	/**
@@ -7395,7 +7389,7 @@
 
 
 /***/ },
-/* 48 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -7403,7 +7397,7 @@
 	 * Module requirements.
 	 */
 
-	var isArray = __webpack_require__(49);
+	var isArray = __webpack_require__(12);
 
 	/**
 	 * Module exports.
@@ -7461,16 +7455,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 49 */
-/***/ function(module, exports) {
-
-	module.exports = Array.isArray || function (arr) {
-	  return Object.prototype.toString.call(arr) == '[object Array]';
-	};
-
-
-/***/ },
-/* 50 */
+/* 48 */
 /***/ function(module, exports) {
 
 	
@@ -7561,7 +7546,7 @@
 
 
 /***/ },
-/* 51 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7570,11 +7555,9 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var Ball = __webpack_require__(52);
-	var Block = __webpack_require__(53);
-	var Paddle = __webpack_require__(54);
-	var Player = __webpack_require__(55);
-	var Socket = __webpack_require__(1);
+	var Ball = __webpack_require__(50);
+	var Block = __webpack_require__(51);
+	var Player = __webpack_require__(52);
 
 	var game = (function () {
 	  function Game(ctx, canvas, socket) {
@@ -7589,6 +7572,7 @@
 	    this.playerSize = 2;
 	    this.blockSize = 42;
 	    this.socket = socket;
+	    this.ballSpawned = false;
 	  }
 
 	  _createClass(Game, [{
@@ -7635,19 +7619,32 @@
 	      myPaddle.playerControlled = true;
 	      game.socket.socket.on('ready', function () {
 	        game.balls.push(new Ball(275, 390, 10, 6, -3));
-	        setInterval(function () {
-	          game.balls.push(new Ball(375, 530, 10, -3, -4));
-	        }, 20000);
+	        this.ballSpawned = true;
+	        if (game.socket.playerNumber !== 1) {
+
+	          // setInterval(function() {
+	          //   game.balls.push(new Ball(375, 530, 10, -3, -4));
+	          // }, 20000);
+	          game.socket.socket.on('ballPositions', function (balls) {
+	            game.balls = balls;
+	          });
+	        }
 	      });
 
 	      requestAnimationFrame(function gameTime() {
 	        game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
 	        game.players.forEach(function (player) {
-	          // console.log(game.socket.paddleInfo[player.num]);
 	          player.draw(game.ctx, game.socket.paddleInfo[player.num]);
 	        });
+	        // if (this.socket.playerNumber === 1) {
+	        game.socket.updateBalls(game.balls);
 	        game.balls.forEach(function (ball) {
 	          ball.draw(game.ctx).move(game.paddles, game.players, game.canvas);
+	          // });
+	          // } else {
+	          game.balls.forEach(function (ball) {
+	            ball.draw(game.ctx);
+	          });
 	        });
 	        game.socket.updatePaddlePositions(myPaddle);
 
@@ -7721,15 +7718,10 @@
 	  return Game;
 	})();
 
-	function random() {
-	  return Math.random() < 0.5 ? -1 : 1;
-	  return Math.random() * (6 - min) + min;
-	}
-
 	module.exports = game;
 
 /***/ },
-/* 52 */
+/* 50 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -7860,7 +7852,7 @@
 	    value: function checkPlayers(players) {
 	      var ball = this;
 	      players.forEach(function (player) {
-	        if (player.status == 1) {
+	        if (player.status === 1) {
 	          ball.checkPaddles(player.paddle);
 	          if (ball.intersects(player)) {
 	            player.status = 0;
@@ -7926,19 +7918,21 @@
 	  return Math.max(min, Math.min(max, val));
 	}
 
-	function getRandomColor() {
-	  var letters = '0123456789ABCDEF'.split('');
-	  var color = '#';
-	  for (var i = 0; i < 6; i++) {
-	    color += letters[Math.floor(Math.random() * 16)];
-	  }
-	  return color;
-	}
+	// for future technicolor abuse
+	//
+	// function getRandomColor() {
+	//     var letters = '0123456789ABCDEF'.split('');
+	//     var color = '#';
+	//     for (var i = 0; i < 6; i++ ) {
+	//         color += letters[Math.floor(Math.random() * 16)];
+	//     }
+	//     return color;
+	// }
 
 	module.exports = ball;
 
 /***/ },
-/* 53 */
+/* 51 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -7976,7 +7970,69 @@
 	module.exports = block;
 
 /***/ },
-/* 54 */
+/* 52 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var Paddle = __webpack_require__(53);
+
+	var player = (function () {
+	  function Player(num, x, y, dimension, canvas, color) {
+	    _classCallCheck(this, Player);
+
+	    this.status = 1;
+	    this.num = num;
+	    this.x = x;
+	    this.y = y;
+	    this.height = dimension;
+	    this.width = dimension;
+	    this.color = color;
+	    this.blocks = [];
+	    this.paddle = new Paddle(num, canvas);
+	  }
+
+	  _createClass(Player, [{
+	    key: 'draw',
+	    value: function draw(ctx, position) {
+	      this.blocks.forEach(function (block) {
+	        block.draw(ctx);
+	      });
+
+	      var imageObj = new Image();
+	      imageObj.src = '../images/Warlords_guy.jpg';
+
+	      ctx.drawImage(imageObj, this.x, this.y, this.width, this.height);
+
+	      if (this.status === 1) {
+	        this.paddle.draw(ctx, this.color, position);
+	      } else {
+	        ctx.globalAlpha = 0.5;
+	        ctx.fillStyle = 'red';
+	        ctx.fillRect(this.x, this.y, this.width, this.height);
+	        ctx.globalAlpha = 1;
+	      }
+
+	      return this;
+	    }
+	  }, {
+	    key: 'paddleListeners',
+	    value: function paddleListeners() {
+	      this.paddle.setupPaddleEventListeners();
+	    }
+	  }]);
+
+	  return Player;
+	})();
+
+	module.exports = player;
+
+/***/ },
+/* 53 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -8232,68 +8288,6 @@
 	})();
 
 	module.exports = paddle;
-
-/***/ },
-/* 55 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	var Paddle = __webpack_require__(54);
-
-	var player = (function () {
-	  function Player(num, x, y, dimension, canvas, color) {
-	    _classCallCheck(this, Player);
-
-	    this.status = 1;
-	    this.num = num;
-	    this.x = x;
-	    this.y = y;
-	    this.height = dimension;
-	    this.width = dimension;
-	    this.color = color;
-	    this.blocks = [];
-	    this.paddle = new Paddle(num, canvas);
-	  }
-
-	  _createClass(Player, [{
-	    key: 'draw',
-	    value: function draw(ctx, position) {
-	      this.blocks.forEach(function (block) {
-	        block.draw(ctx);
-	      });
-
-	      var imageObj = new Image();
-	      imageObj.src = '../images/Warlords_guy.jpg';
-
-	      ctx.drawImage(imageObj, this.x, this.y, this.width, this.height);
-
-	      if (this.status === 1) {
-	        this.paddle.draw(ctx, this.color, position);
-	      } else {
-	        ctx.globalAlpha = 0.5;
-	        ctx.fillStyle = 'red';
-	        ctx.fillRect(this.x, this.y, this.width, this.height);
-	        ctx.globalAlpha = 1;
-	      }
-
-	      return this;
-	    }
-	  }, {
-	    key: 'paddleListeners',
-	    value: function paddleListeners() {
-	      this.paddle.setupPaddleEventListeners();
-	    }
-	  }]);
-
-	  return Player;
-	})();
-
-	module.exports = player;
 
 /***/ }
 /******/ ]);
