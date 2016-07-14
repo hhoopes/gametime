@@ -20,6 +20,11 @@ app.get('/warlords.js', function(req, res) {
 });
 
 
+app.get('/images/Warlords_guy.jpg', function(req, res) {
+  res.sendFile(__dirname + '/images/Warlords_guy.jpg');
+});
+
+
 const PORT = process.env.PORT || 3000;
 
 io.on('connection', function(socket){
