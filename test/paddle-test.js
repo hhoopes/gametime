@@ -53,11 +53,11 @@ describe('paddle', function() {
       });
 
       it('assigns rightKeyCode to be 39', function() {
-        expect(paddle.rightKeyCode).to.eql(39);
+        expect(paddle.rightKeyCode).to.eql(81);
       });
 
       it('assigns leftKeyCode to be 37', function() {
-        expect(paddle.leftKeyCode).to.eql(37);
+        expect(paddle.leftKeyCode).to.eql(49);
       });
     });
   });
