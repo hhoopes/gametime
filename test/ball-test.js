@@ -49,14 +49,14 @@ describe('Ball', function() {
     it('should change x by speed', function () {
       let ball = new Ball(xy, xy, radius, speed, speed);
       assert.equal(ball.x, xy);
-      ball.move(paddles, players, canvas);
+      ball.move(players, canvas);
       assert.equal(ball.x, xy+speed);
     });
 
     it('should change y by speed', function () {
       let ball = new Ball(xy, xy, radius, speed, speed);
       assert.equal(ball.y, xy);
-      ball.move(paddles, players, canvas);
+      ball.move(players, canvas);
       assert.equal(ball.y, xy+speed);
     })
   })
