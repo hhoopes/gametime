@@ -113,7 +113,7 @@
 	      this.ctx.font = "30px Arial";
 	      this.ctx.fillStyle = "white";
 	      this.ctx.fillText("1/Q", 35, 60);
-	      this.ctx.fillText("P/-", this.canvas.width - 85, 60);
+	      this.ctx.fillText("P/0", this.canvas.width - 85, 60);
 	      this.ctx.fillText("Z/X", 35, this.canvas.height - 35);
 	      this.ctx.fillText("Left/Right", this.canvas.width - 165, this.canvas.height - 35);
 	      this.ctx.textAlign = "center";
@@ -695,7 +695,7 @@
 	      if (this.player === 1) {
 	        return 49;
 	      } else if (this.player === 2) {
-	        return 80;
+	        return 48;
 	      } else if (this.player === 3) {
 	        return 90;
 	      } else if (this.player === 4) {
@@ -708,7 +708,7 @@
 	      if (this.player === 1) {
 	        return 81;
 	      } else if (this.player === 2) {
-	        return 189;
+	        return 80;
 	      } else if (this.player === 3) {
 	        return 88;
 	      } else if (this.player === 4) {
