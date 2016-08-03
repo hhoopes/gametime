@@ -20,10 +20,6 @@ describe('Game', function() {
       assert.equal(game.balls.length, 0);
     });
 
-    it('should create empty paddle array', function() {
-      assert.equal(game.paddles.length, 0);
-    });
-
     it('should create empty player array', function() {
       assert.equal(game.players.length, 0);
     });
@@ -31,7 +27,7 @@ describe('Game', function() {
     it('should establish block and player sizes', function() {
       assert.equal(game.cornerSize, 5);
       assert.equal(game.playerSize, 2);
-      assert.equal(game.blockSize, 43);
+      assert.equal(game.blockSize, 42);
     });
   });
 
